@@ -1,0 +1,73 @@
+import { NavLink, Outlet } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { logout } from '../store/slices/authSlice';
+
+// Only "Dashboard" is wired up in this phase. The rest of Section 5's admin
+// pages (Users, Restaurants, Orders, Categories, Coupons) get their own nav
+// entries as each is built in Step 11, rather than linking to pages that
+// don't exist yet.
+const navItems = [{ label: 'Dashboard', to: '/admin/dashboard' }];
+
+const AdminLayout = () => {
+  const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate('/login');
+  };
+
+  return (
+    <div className="flex min-h-screen bg-paper">
+      <aside className="flex w-60 flex-shrink-0 flex-col justify-between bg-indigo-600 text-paper">
+        <div>
+          <div className="px-6 py-6">
+            <p className="font-display text-xl">
+              Khaja<span className="text-marigold-400">Go</span>
+            </p>
+            <p className="mt-0.5 font-sans text-xs text-paper/60">Admin</p>
+          </div>
+          <nav className="mt-2 flex flex-col gap-1 px-3">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  `rounded-lg px-3 py-2 font-sans text-sm transition-colors ${
+                    isActive
+                      ? 'bg-indigo-700 text-paper'
+                      : 'text-paper/70 hover:bg-indigo-700/60 hover:text-paper'
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
+          <p className="mt-6 px-6 font-sans text-xs leading-relaxed text-paper/40">
+            More sections (users, restaurants, orders, categories, coupons)
+            unlock as Steps 4–11 are built.
+          </p>
+        </div>
+
+        <div className="border-t border-paper/10 px-6 py-4">
+          <p className="truncate font-sans text-sm text-paper/80">{user?.name}</p>
+          <button
+            onClick={handleLogout}
+            className="mt-2 font-sans text-xs text-paper/50 hover:text-paper"
+          >
+            Log out
+          </button>
+        </div>
+      </aside>
+
+      <main className="flex-1 overflow-y-auto">
+        <Outlet />
+      </main>
+    </div>
+  );
+};
+
+export default AdminLayout;

@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-sans: "Work Sans", ui-sans-serif, system-ui, sans-serif;
+
+  --color-ink: #211a14;
+  --color-paper: #f6f2ea;
+  --color-indigo-50: #eef0f5;
+  --color-indigo-100: #d6dae6;
+  --color-indigo-400: #3d4d75;
+  --color-indigo-500: #29365a;
+  --color-indigo-600: #1e2a4a;
+  --color-indigo-700: #161f38;
+  --color-indigo-900: #0d1424;
+  --color-marigold-100: #fbe8c6;
+  --color-marigold-400: #edb54f;
+  --color-marigold-500: #e8a230;
+  --color-marigold-600: #c9841c;
+  --color-chili-500: #b23a2e;
+  --color-chili-600: #94291f;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+/* Respect reduced-motion preferences for the one deliberate transition we use. */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
