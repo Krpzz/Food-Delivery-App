@@ -42,12 +42,6 @@ stack.
 
 ## Setup
 
-### Prerequisites
-
-- Node.js 18+
-- A MongoDB connection string — [MongoDB Atlas](https://www.mongodb.com/atlas)
-  free tier is the easiest option if you don't have Mongo running locally
-
 ### 1. Backend
 
 ```bash
