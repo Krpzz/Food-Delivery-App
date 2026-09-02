@@ -40,32 +40,7 @@ customer code under `frontend/src/pages/customer`, restaurant owner code under
 and all of them talk to the same `backend/routes` → `controllers` → `models`
 stack.
 
-## Setup
-
-### 1. Backend
-
-```bash
-cd backend
-cp .env.example .env
-# edit .env — at minimum set MONGO_URI and JWT_SECRET
-npm install
-npm run seed   # creates the one ADMIN account (see below)
-npm run dev    # starts the API on http://localhost:5000
 ```
-
-### 2. Frontend
-
-```bash
-cd frontend
-cp .env.example .env
-npm install
-npm run dev    # starts the app on http://localhost:5173
-```
-
-Open `http://localhost:5173`, register as a customer or a restaurant, and
-you'll land on the matching dashboard. Log in as the seeded admin (see
-below) to see the admin shell.
-
 
 ## Security notes (Section 20)
 
