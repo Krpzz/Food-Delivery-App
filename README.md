@@ -28,10 +28,10 @@ authentication (backend + frontend) are built and verified. See
 
 ```
 food-delivery-app/
-├── backend/     API server — see backend/README section below
-├── frontend/    React app — see frontend/README section below
-├── .env.example       full list of every env var used in the project
-└── README.md          this file
+├── backend/     
+├── frontend/   
+├── .env.example       
+└── README.md          
 ```
 
 Inside each half, the code is organized exactly the way the spec calls for:
