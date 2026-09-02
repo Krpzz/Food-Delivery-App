@@ -77,12 +77,3 @@ Following Section 25's development order exactly:
 | 11 | Admin dashboard and management | Planned |
 | 12 | Full-flow testing | Planned |
 
-## A note on two small deviations from the literal file tree
-
-- `.env.example` lives at the root **and** inside `backend/`/`frontend/` —
-  Node/Vite only read `.env` from their own working directory, so the
-  per-app copies are what actually get used; the root one is a single
-  reference for everything.
-- `bcryptjs` is used instead of `bcrypt` — identical API, pure JavaScript,
-  no native build step required. Swapping back is a one-line change in
-  `models/User.js` if you'd rather use native `bcrypt`.
