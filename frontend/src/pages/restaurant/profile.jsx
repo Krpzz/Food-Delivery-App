@@ -5,7 +5,7 @@ import {
   createRestaurant,
   updateRestaurant,
   setActiveRestaurant,
-} from '../../store/slices/restaurantSlice';
+} from '../../store/slices/resturantSlice';
 import Loading from '../../components/Loading';
 
 const emptyForm = {

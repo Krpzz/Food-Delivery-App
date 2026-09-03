@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import restaurantService from '../../services/restaurantService';
+import restaurantService from '../../services/resturantService';
 
 const initialState = {
   myRestaurants: [],

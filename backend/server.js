@@ -11,7 +11,7 @@ const { notFound, errorHandler } = require('./middleware/errorMiddleware');
  
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
-const restaurantRoutes = require('./routes/restaurantRoutes');
+const restaurantRoutes = require('./routes/resturantRoutes');
 const menuRoutes = require('./routes/menuRoutes');
  
 connectDB();
@@ -41,6 +41,10 @@ const apiLimiter = rateLimit({
 });
 app.use('/api', apiLimiter);
  
+app.get('/', (req, res) => {
+  res.json({ success: true, message: 'Food delivery API is running' });
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'API is running' });
 });

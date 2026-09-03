@@ -1,4 +1,5 @@
-
+const dns = require('dns');
+dns.setServers(['1.1.1.1', '1.0.0.1']);
 require('dotenv').config();
 const mongoose = require('mongoose');
 const User = require('../models/User');

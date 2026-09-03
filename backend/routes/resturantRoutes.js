@@ -2,7 +2,7 @@ const express = require('express');
 const { body } = require('express-validator');
 const { protect } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/adminMiddleware');
-const upload = require('../middleware/uploadMiddleware');
+const upload = require('../middleware/uplaodMiddleware');
 const {
   getRestaurants,
   getRestaurantById,
@@ -10,7 +10,7 @@ const {
   createRestaurant,
   updateRestaurant,
   deleteRestaurant,
-} = require('../controllers/restaurantController');
+} = require('../controllers/resturantController');
 
 const router = express.Router();
 
