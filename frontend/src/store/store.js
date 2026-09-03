@@ -1,9 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
-
+import restaurantReducer from './slices/restaurantSlice';
+ 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
-    // cartSlice and restaurantSlice are added in the Cart and Customer System phases.
+    restaurant: restaurantReducer,
   },
 });
