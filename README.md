@@ -33,7 +33,15 @@ categories, restaurant dashboard) are built and verified. See
 - A full demo dataset: 10 restaurants, 56 menu items, 12 categories, 3
   restaurant owners, 20 customers, 5 coupons — across all 6 target cities
 
+## Project structure
 
+```
+food-delivery-app/
+├── backend/     API server — see backend/README section below
+├── frontend/    React app — see frontend/README section below
+├── .env.example       full list of every env var used in the project
+└── README.md          this file
+```
 
 Inside each half, the code is organized exactly the way the spec calls for:
 customer code under `frontend/src/pages/customer`, restaurant owner code under
@@ -135,26 +143,3 @@ Following Section 25's development order exactly:
 | 10 | Reviews (completed orders only) | Planned |
 | 11 | Admin dashboard and management | Planned |
 | 12 | Full-flow testing | Planned |
-
-## A note on small deviations from the literal file tree
-
-- `.env.example` lives at the root **and** inside `backend/`/`frontend/` —
-  Node/Vite only read `.env` from their own working directory, so the
-  per-app copies are what actually get used; the root one is a single
-  reference for everything.
-- `bcryptjs` is used instead of `bcrypt` — identical API, pure JavaScript,
-  no native build step required. Swapping back is a one-line change in
-  `models/User.js` if you'd rather use native `bcrypt`.
-- `backend/utils/uploadImage.js` and `backend/middleware/uploadMiddleware.js`
-  aren't in the original file list, but Cloudinary uploads need somewhere to
-  live — a Cloudinary-upload helper and a multer config, both reused by
-  restaurant and menu-item image uploads.
-- Category management isn't a separate `categoryController.js`/routes file;
-  it lives inside `menuController.js`/`menuRoutes.js` since categories exist
-  to organize menu items and Section 13 groups "food/menu operations" under
-  `/api/menu`. Both `RESTAURANT` and `ADMIN` can create categories (Section 4
-  lists "Add categories" under restaurant owner features); only `ADMIN` can
-  rename or deactivate one, so the list doesn't fragment into near-duplicates.
-- A restaurant owner can run **more than one** restaurant — the restaurant
-  and menu APIs are built around that from the start, since the seed data
-  (3 owners, 10 restaurants) makes it a real requirement, not an edge case.
