@@ -1,38 +1,6 @@
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-const payWithEsewa = async () => {
-    const { data } = await axios.post(
-        "http://localhost:5000/api/payment/esewa/initiate",
-        {
-            amount: cartTotal
-        }
-    );
-
-    const form = document.createElement("form");
-
-    form.method = "POST";
-    form.action =
-        "https://rc-epay.esewa.com.np/api/epay/main/v2/form";
-
-    Object.entries({
-        ...data
-    }).forEach(([key, value]) => {
-        const input =
-            document.createElement("input");
-
-        input.type = "hidden";
-        input.name = key;
-        input.value = value;
-
-        form.appendChild(input);
-    });
-
-    document.body.appendChild(form);
-
-    form.submit();
-};
-
 const Home = () => {
   const { user } = useSelector((state) => state.auth);
 
@@ -76,7 +44,7 @@ const Home = () => {
 
       <div className="mt-16 grid gap-4 border-t border-ink/10 pt-10 sm:grid-cols-3">
         {[
-          { title: 'Restaurant system', note: 'Step 4 — browsing, menus, categories' },
+          { title: 'Restaurant browsing', note: 'Step 5 — this page becomes real search & listings' },
           { title: 'Cart & checkout', note: 'Steps 6–7 — address, coupons, fees' },
           { title: 'eSewa payments', note: 'Step 9 — verified against live docs' },
         ].map((item) => (
@@ -87,29 +55,7 @@ const Home = () => {
         ))}
       </div>
     </div>
-    
   );
 };
-<button onClick={payWithEsewa}>
-    Pay with eSewa
-</button>
-
-export const esewaSuccess = async (req, res) => {
-    console.log("eSewa success:", req.query);
-
-    res.send(`
-        <h1>Payment Successful</h1>
-        <p>You can close this window.</p>
-    `);
-};
-
-export const esewaFailure = async (req, res) => {
-    console.log("eSewa failure:", req.query);
-
-    res.send(`
-        <h1>Payment Failed</h1>
-    `);
-};
-
 
 export default Home;

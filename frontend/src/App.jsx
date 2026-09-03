@@ -9,6 +9,10 @@ import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import Home from './pages/customer/Home';
 import RestaurantDashboard from './pages/restaurant/Dashboard';
+import RestaurantProfile from './pages/restaurant/profile';
+import RestaurantMenu from './pages/restaurant/menu';
+import AddMenuItem from './pages/restaurant/addMenuItem';
+import EditMenuItem from './pages/restaurant/editMenuItem';
 import AdminDashboard from './pages/admin/Dashboard';
 
 function App() {
@@ -20,7 +24,7 @@ function App() {
       <Route element={<CustomerLayout />}>
         <Route path="/" element={<Home />} />
         {/* Restaurants, RestaurantDetails, Cart, Checkout, Orders, OrderDetails,
-            Favorites, Profile, Addresses are added in Steps 4-10. */}
+            Favorites, Profile, Addresses are added in Steps 5-10. */}
       </Route>
 
       <Route
@@ -32,7 +36,11 @@ function App() {
         }
       >
         <Route path="dashboard" element={<RestaurantDashboard />} />
-        {/* Orders, Menu, AddMenuItem, EditMenuItem, Profile are added in Step 4. */}
+        <Route path="profile" element={<RestaurantProfile />} />
+        <Route path="menu" element={<RestaurantMenu />} />
+        <Route path="menu/add" element={<AddMenuItem />} />
+        <Route path="menu/:id/edit" element={<EditMenuItem />} />
+        {/* Orders is added in Step 8. */}
       </Route>
 
       <Route
@@ -49,6 +57,5 @@ function App() {
     </Routes>
   );
 }
-
 
 export default App;

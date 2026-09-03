@@ -2,7 +2,7 @@ import { useSelector } from 'react-redux';
 
 const STATS = [
   { label: 'Total customers', note: 'Step 11' },
-  { label: 'Total restaurants', note: 'Step 4' },
+  { label: 'Total restaurants', note: 'Step 11' },
   { label: 'Total orders', note: 'Step 8' },
   { label: 'Total revenue', note: 'Step 11' },
   { label: 'Pending orders', note: 'Step 8' },
