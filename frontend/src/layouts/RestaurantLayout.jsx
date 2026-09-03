@@ -2,9 +2,11 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../store/slices/authSlice';
 
-// Same pattern as AdminLayout: only "Dashboard" exists so far. Orders, Menu,
-// and Profile are added in Step 4 (Restaurant System).
-const navItems = [{ label: 'Dashboard', to: '/restaurant/dashboard' }];
+const navItems = [
+  { label: 'Dashboard', to: '/restaurant/dashboard' },
+  { label: 'Menu', to: '/restaurant/menu' },
+  { label: 'Profile', to: '/restaurant/profile' },
+];
 
 const RestaurantLayout = () => {
   const { user } = useSelector((state) => state.auth);
@@ -44,7 +46,7 @@ const RestaurantLayout = () => {
             ))}
           </nav>
           <p className="mt-6 px-6 font-sans text-xs leading-relaxed text-paper/40">
-            Menu management and order handling unlock in Step 4.
+            Order handling arrives in Step 8.
           </p>
         </div>
 
