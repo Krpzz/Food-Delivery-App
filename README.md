@@ -33,15 +33,7 @@ categories, restaurant dashboard) are built and verified. See
 - A full demo dataset: 10 restaurants, 56 menu items, 12 categories, 3
   restaurant owners, 20 customers, 5 coupons — across all 6 target cities
 
-## Project structure
 
-```
-food-delivery-app/
-├── backend/     API server — see backend/README section below
-├── frontend/    React app — see frontend/README section below
-├── .env.example       full list of every env var used in the project
-└── README.md          this file
-```
 
 Inside each half, the code is organized exactly the way the spec calls for:
 customer code under `frontend/src/pages/customer`, restaurant owner code under
