@@ -1,5 +1,4 @@
 const DELIVERY_FEE = 60;
-const SERVICE_FEE_RATE = 0.02;
 const TAX_RATE = 0.13;
 
 const calculateOrderTotal = ({ items, coupon }) => {
@@ -9,7 +8,6 @@ const calculateOrderTotal = ({ items, coupon }) => {
   }, 0);
 
   const deliveryFee = DELIVERY_FEE;
-  const serviceFee = Math.round(subtotal * SERVICE_FEE_RATE);
   const tax = Math.round(subtotal * TAX_RATE);
 
   let discount = 0;
@@ -20,9 +18,9 @@ const calculateOrderTotal = ({ items, coupon }) => {
     discount = Math.min(discount, subtotal);
   }
 
-  const total = Math.max(subtotal + deliveryFee + serviceFee + tax - discount, 0);
+  const total = Math.max(subtotal + deliveryFee + tax - discount, 0);
 
-  return { subtotal, deliveryFee, serviceFee, tax, discount, total };
+  return { subtotal, deliveryFee, tax, discount, total };
 };
 
 module.exports = calculateOrderTotal;

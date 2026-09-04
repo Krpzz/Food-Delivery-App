@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import userService from '../../services/userService';
 import orderService from '../../services/orderService';
-import AddressForm from '../../components/AddressForm';
+import AddressForm from './addresses';
 import Loading from '../../components/Loading';
 
 const TotalRow = ({ label, value }) => (
