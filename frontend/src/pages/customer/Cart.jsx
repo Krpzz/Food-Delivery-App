@@ -59,13 +59,12 @@ const Cart = () => {
         </div>
       </div>
 
-      <button
-        disabled
-        title="Checkout arrives in Step 7"
-        className="mt-6 w-full cursor-not-allowed rounded-lg bg-ink/10 py-3 font-sans text-sm text-ink/40"
+      <Link
+        to="/checkout"
+        className="mt-6 block w-full rounded-lg bg-indigo-600 py-3 text-center font-sans text-sm text-paper hover:bg-indigo-700"
       >
-        Proceed to checkout — Step 7
-      </button>
+        Proceed to checkout
+      </Link>
     </div>
   );
 };
