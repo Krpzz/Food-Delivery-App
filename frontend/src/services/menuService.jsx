@@ -1,5 +1,10 @@
 import api from './api';
 
+const getMenuItems = async (params = {}) => {
+  const { data } = await api.get('/menu', { params });
+  return data;
+};
+
 const getCategories = async () => {
   const { data } = await api.get('/menu/categories');
   return data;
@@ -38,6 +43,7 @@ const deleteMenuItem = async (id) => {
 export default {
   getCategories,
   createCategory,
+  getMenuItems,
   getMenuItemsByRestaurant,
   getMenuItem,
   createMenuItem,
