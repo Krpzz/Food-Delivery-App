@@ -5,9 +5,9 @@ technically independent of) Zomato, Swiggy and Bhoj. No rider system, no
 real-time tracking — customers check order status by opening the order page,
 per the MVP spec.
 
-**Status: Steps 1–5 of 12 complete** — Project setup, database models,
-authentication, the Restaurant System, and the customer-facing browsing
-experience are built and verified. See [Roadmap](#roadmap) below.
+**Status: Steps 1–6 of 12 complete** — Project setup, database models,
+authentication, the Restaurant System, customer browsing, and the Cart are
+built and verified. See [Roadmap](#roadmap) below.
 
 ## Tech stack
 
@@ -21,20 +21,20 @@ experience are built and verified. See [Roadmap](#roadmap) below.
 - Role-based authorization (`CUSTOMER` / `RESTAURANT` / `ADMIN`) enforced on
   the backend — the frontend's route guards are just UX on top of that
 - All 9 MongoDB models (User, Restaurant, Category, MenuItem, Address, Order,
-  Payment, Review, Coupon)
+  Payment, Review, Coupon) — notably, no Cart model, on purpose (see below)
 - Restaurant owners can create/edit restaurant profiles (with logo + cover
   image upload to Cloudinary) and manage **multiple** restaurants each — the
   seed data uses 3 owners across 10 restaurants, so this had to be a real
   one-to-many relationship, not a simplified 1:1 shortcut
 - Full menu CRUD with categories, availability toggling, and photo upload
-- **Customer browsing is fully functional**: a real home page with city
-  quick-filters and a category strip, a restaurant listing page with
-  search/filter/sort, and restaurant detail pages showing the live menu
-  grouped by category
-- **Two distinct search modes**, per Section 18 — restaurants (search,
-  city, cuisine, open-now, sort by rating/newest/name) and dishes
-  (search, city, category, veg-only, sort by price) — toggled via tabs on
-  the listing page
+- Customer browsing: home page, restaurant listing with search/filter/sort,
+  restaurant detail pages with the live menu grouped by category, and a
+  Restaurants/Dishes tab (Section 18's two search modes) on the listing page
+- **A real, working cart**: add/remove, increment/decrement quantity, clear
+  cart, and restaurant validation (adding from a second restaurant prompts to
+  replace the cart rather than silently mixing orders). Client-side by
+  design — there's no `Cart` model, so it lives in Redux and localStorage
+  until Checkout turns it into a real `Order`
 - A full demo dataset: 10 restaurants, 56 menu items, 12 categories, 3
   restaurant owners, 20 customers, 5 coupons — across all 6 target cities
 
@@ -141,8 +141,8 @@ Following Section 25's development order exactly:
 | 1–3 | Project setup, database models, authentication | ✅ Done |
 | 4 | Restaurant CRUD, menu CRUD, categories, restaurant dashboard | ✅ Done |
 | 5 | Customer home, restaurant listing/details, search, filters | ✅ Done |
-| 6 | Cart | Next |
-| 7 | Checkout (address, coupon, fees) | Planned |
+| 6 | Cart | ✅ Done |
+| 7 | Checkout (address, coupon, fees) | Next |
 | 8 | Orders (create, accept, prepare, ready, complete) | Planned |
 | 9 | eSewa integration | Planned — will verify against current official docs before writing any endpoint code |
 | 10 | Reviews (completed orders only) | Planned |
@@ -188,3 +188,13 @@ Following Section 25's development order exactly:
   assign Favorites to a step, and Reviews is explicitly Step 10. Restaurant
   cards do show the real aggregate rating already stored on each restaurant,
   since that data already exists.
+- There's no `Cart` model and no cart API — deliberately. Section 12's model
+  list has no Cart, so the cart lives entirely in Redux (persisted to
+  localStorage), and only becomes a real, backend-validated `Order` at
+  Checkout/Step 8. The "backend must calculate the final total" rule
+  (Section 9) applies to that order-creation step, not to the cart itself.
+- The cart doesn't require login. Section 7's flow lists Login before
+  Browse/Cart, but gating cart-building behind auth is a product choice the
+  spec doesn't force, and letting people build a cart before signing up is
+  the more common pattern. Login becomes mandatory at Checkout (Step 7),
+  since that's where a real, user-owned Order gets created.
