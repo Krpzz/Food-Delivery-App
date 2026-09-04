@@ -11,6 +11,8 @@ import Home from './pages/customer/Home';
 import Restaurants from './pages/customer/Restaurants';
 import RestaurantDetails from './pages/customer/RestaurantDetails';
 import Cart from './pages/customer/Cart';
+import Checkout from './pages/customer/checkout';
+import Addresses from './pages/customer/addresses';
 import RestaurantDashboard from './pages/restaurant/Dashboard';
 import RestaurantProfile from './pages/restaurant/Profile';
 import RestaurantMenu from './pages/restaurant/Menu';
@@ -29,8 +31,22 @@ function App() {
         <Route path="/restaurants" element={<Restaurants />} />
         <Route path="/restaurants/:id" element={<RestaurantDetails />} />
         <Route path="/cart" element={<Cart />} />
-        {/* Checkout, Orders, OrderDetails, Favorites, Profile, Addresses
-            are added in Steps 7-10. */}
+        <Route
+          path="/checkout"
+          element={
+            <ProtectedRoute>
+              <Checkout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/addresses"
+          element={
+            <ProtectedRoute>
+              <Addresses />
+            </ProtectedRoute>
+          }
+        />
       </Route>
 
       <Route
@@ -46,7 +62,6 @@ function App() {
         <Route path="menu" element={<RestaurantMenu />} />
         <Route path="menu/add" element={<AddMenuItem />} />
         <Route path="menu/:id/edit" element={<EditMenuItem />} />
-        {/* Orders is added in Step 8. */}
       </Route>
 
       <Route
@@ -58,7 +73,6 @@ function App() {
         }
       >
         <Route path="dashboard" element={<AdminDashboard />} />
-        {/* Users, Restaurants, Orders, Categories, Coupons are added in Step 11. */}
       </Route>
     </Routes>
   );
