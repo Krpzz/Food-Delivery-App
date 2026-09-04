@@ -8,11 +8,13 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import Home from './pages/customer/Home';
+import Restaurants from './pages/customer/Restaurants';
+import RestaurantDetails from './pages/customer/RestaurantDetails';
 import RestaurantDashboard from './pages/restaurant/Dashboard';
-import RestaurantProfile from './pages/restaurant/profile';
-import RestaurantMenu from './pages/restaurant/menu';
-import AddMenuItem from './pages/restaurant/addMenuItem';
-import EditMenuItem from './pages/restaurant/editMenuItem';
+import RestaurantProfile from './pages/restaurant/Profile';
+import RestaurantMenu from './pages/restaurant/Menu';
+import AddMenuItem from './pages/restaurant/AddMenuItem';
+import EditMenuItem from './pages/restaurant/EditMenuItem';
 import AdminDashboard from './pages/admin/Dashboard';
 
 function App() {
@@ -23,8 +25,10 @@ function App() {
 
       <Route element={<CustomerLayout />}>
         <Route path="/" element={<Home />} />
-        {/* Restaurants, RestaurantDetails, Cart, Checkout, Orders, OrderDetails,
-            Favorites, Profile, Addresses are added in Steps 5-10. */}
+        <Route path="/restaurants" element={<Restaurants />} />
+        <Route path="/restaurants/:id" element={<RestaurantDetails />} />
+        {/* Cart, Checkout, Orders, OrderDetails, Favorites, Profile, Addresses
+            are added in Steps 6-10. */}
       </Route>
 
       <Route
