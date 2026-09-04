@@ -5,10 +5,9 @@ technically independent of) Zomato, Swiggy and Bhoj. No rider system, no
 real-time tracking — customers check order status by opening the order page,
 per the MVP spec.
 
-**Status: Steps 1–4 of 12 complete** — Project setup, database models,
-authentication, and the full Restaurant System (restaurant CRUD, menu CRUD,
-categories, restaurant dashboard) are built and verified. See
-[Roadmap](#roadmap) below.
+**Status: Steps 1–5 of 12 complete** — Project setup, database models,
+authentication, the Restaurant System, and the customer-facing browsing
+experience are built and verified. See [Roadmap](#roadmap) below.
 
 ## Tech stack
 
@@ -28,8 +27,14 @@ categories, restaurant dashboard) are built and verified. See
   seed data uses 3 owners across 10 restaurants, so this had to be a real
   one-to-many relationship, not a simplified 1:1 shortcut
 - Full menu CRUD with categories, availability toggling, and photo upload
-- Public restaurant browsing API with search/filter/sort (consumed by the
-  frontend starting in Step 5)
+- **Customer browsing is fully functional**: a real home page with city
+  quick-filters and a category strip, a restaurant listing page with
+  search/filter/sort, and restaurant detail pages showing the live menu
+  grouped by category
+- **Two distinct search modes**, per Section 18 — restaurants (search,
+  city, cuisine, open-now, sort by rating/newest/name) and dishes
+  (search, city, category, veg-only, sort by price) — toggled via tabs on
+  the listing page
 - A full demo dataset: 10 restaurants, 56 menu items, 12 categories, 3
   restaurant owners, 20 customers, 5 coupons — across all 6 target cities
 
@@ -135,11 +140,51 @@ Following Section 25's development order exactly:
 |---|---|---|
 | 1–3 | Project setup, database models, authentication | ✅ Done |
 | 4 | Restaurant CRUD, menu CRUD, categories, restaurant dashboard | ✅ Done |
-| 5 | Customer home, restaurant listing/details, search, filters | Next |
-| 6 | Cart | Planned |
+| 5 | Customer home, restaurant listing/details, search, filters | ✅ Done |
+| 6 | Cart | Next |
 | 7 | Checkout (address, coupon, fees) | Planned |
 | 8 | Orders (create, accept, prepare, ready, complete) | Planned |
 | 9 | eSewa integration | Planned — will verify against current official docs before writing any endpoint code |
 | 10 | Reviews (completed orders only) | Planned |
 | 11 | Admin dashboard and management | Planned |
 | 12 | Full-flow testing | Planned |
+
+## A note on small deviations from the literal file tree
+
+- `.env.example` lives at the root **and** inside `backend/`/`frontend/` —
+  Node/Vite only read `.env` from their own working directory, so the
+  per-app copies are what actually get used; the root one is a single
+  reference for everything.
+- `bcryptjs` is used instead of `bcrypt` — identical API, pure JavaScript,
+  no native build step required. Swapping back is a one-line change in
+  `models/User.js` if you'd rather use native `bcrypt`.
+- `backend/utils/uploadImage.js` and `backend/middleware/uploadMiddleware.js`
+  aren't in the original file list, but Cloudinary uploads need somewhere to
+  live — a Cloudinary-upload helper and a multer config, both reused by
+  restaurant and menu-item image uploads.
+- Category management isn't a separate `categoryController.js`/routes file;
+  it lives inside `menuController.js`/`menuRoutes.js` since categories exist
+  to organize menu items and Section 13 groups "food/menu operations" under
+  `/api/menu`. Both `RESTAURANT` and `ADMIN` can create categories (Section 4
+  lists "Add categories" under restaurant owner features); only `ADMIN` can
+  rename or deactivate one, so the list doesn't fragment into near-duplicates.
+- A restaurant owner can run **more than one** restaurant — the restaurant
+  and menu APIs are built around that from the start, since the seed data
+  (3 owners, 10 restaurants) makes it a real requirement, not an edge case.
+- Section 2's page list has one `Restaurants.jsx`, but Section 18 asks
+  customers to search both restaurants *and* dishes. Rather than invent a
+  second page file, `Restaurants.jsx` has a Restaurants/Dishes tab that
+  swaps both the filter set and the results grid — restaurant search hits
+  `GET /api/restaurants`, dish search hits the new `GET /api/menu`.
+- `GET /api/menu` (cross-restaurant dish search) isn't in the original API
+  list, but nothing else could serve "search food items" (Section 3) once
+  menu items became restaurant-scoped in Step 4. It only ever returns items
+  from approved restaurants.
+- "Select location" from the Section 7 customer flow is implemented as
+  simple city quick-filters (Home) and a city dropdown (listing page) —
+  not GPS/geolocation, which would be more complexity than an MVP needs.
+- Favorites and Reviews display aren't built yet even though they're
+  customer-facing browsing features — Section 25's 12 steps never actually
+  assign Favorites to a step, and Reviews is explicitly Step 10. Restaurant
+  cards do show the real aggregate rating already stored on each restaurant,
+  since that data already exists.
