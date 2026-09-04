@@ -1,9 +1,12 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../store/slices/authSlice';
+import { getCartItemCount } from '../utils/CartUtils';
 
 const Navbar = () => {
   const { user } = useSelector((state) => state.auth);
+  const cartItems = useSelector((state) => state.cart.items);
+  const cartCount = getCartItemCount(cartItems);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -22,6 +25,14 @@ const Navbar = () => {
         <nav className="flex items-center gap-5">
           <Link to="/restaurants" className="hidden font-sans text-sm text-ink/70 hover:text-ink sm:inline">
             Restaurants
+          </Link>
+          <Link to="/cart" className="relative font-sans text-sm text-ink/70 hover:text-ink">
+            Cart
+            {cartCount > 0 && (
+              <span className="absolute -right-3 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-marigold-500 font-sans text-[10px] font-medium text-ink">
+                {cartCount}
+              </span>
+            )}
           </Link>
           {user ? (
             <>
