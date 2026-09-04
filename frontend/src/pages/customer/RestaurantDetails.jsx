@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import restaurantService from '../../services/restaurantService';
+import restaurantService from '../../services/resturantService';
 import menuService from '../../services/menuService';
 import FoodCard from '../../components/FoodCard';
 import Loading from '../../components/Loading';

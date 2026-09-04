@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import restaurantService from '../../services/restaurantService';
+import restaurantService from '../../services/resturantService';
 import menuService from '../../services/menuService';
-import RestaurantCard from '../../components/RestaurantCard';
+import RestaurantCard from '../../components/ResturantCard';
 import FoodCard from '../../components/FoodCard';
 import Loading from '../../components/Loading';
 
