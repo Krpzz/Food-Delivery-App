@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import restaurantService from '../../services/resturantService';
+import restaurantService from '../../services/restaurantService';
 import menuService from '../../services/menuService';
 import FoodCard from '../../components/FoodCard';
 import Loading from '../../components/Loading';
@@ -97,7 +97,7 @@ const RestaurantDetails = () => {
         ) : (
           <div className="mt-6 space-y-3">
             {visibleItems.map((item) => (
-              <FoodCard key={item._id} item={item} />
+              <FoodCard key={item._id} item={item} restaurantId={restaurant._id} restaurantName={restaurant.name} />
             ))}
           </div>
         )}
