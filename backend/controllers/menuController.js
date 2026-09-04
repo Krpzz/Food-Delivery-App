@@ -38,7 +38,8 @@ const createCategory = async (req, res, next) => {
   }
 };
 
-
+// ADMIN only. The management UI for these lands in Step 11 — the API is
+// ready ahead of time since Section 25 groups "Categories" under Step 4.
 const updateCategory = async (req, res, next) => {
   try {
     const category = await Category.findById(req.params.id);
@@ -70,6 +71,10 @@ const deleteCategory = async (req, res, next) => {
   }
 };
 
+// ---------- Menu items ----------
+
+// Every mutation below re-derives ownership from the database — never from
+// a restaurant ID the client claims to own (Section 20).
 const assertOwnsRestaurant = async (restaurantId, user) => {
   const restaurant = await Restaurant.findById(restaurantId);
   if (!restaurant) {
@@ -83,6 +88,37 @@ const assertOwnsRestaurant = async (restaurantId, user) => {
     throw err;
   }
   return restaurant;
+};
+
+// Cross-restaurant dish search — Section 18 asks customers to be able to
+// search "Restaurants" AND "Food items" as two distinct modes. Restaurant
+// search already lives in restaurantController; this is the food-item half,
+// scoped to items from restaurants customers can actually see (approved).
+const getMenuItems = async (req, res, next) => {
+  try {
+    const { search, category, isVeg, city, maxPrice, sort } = req.query;
+
+    const restaurantFilter = { isApproved: true };
+    if (city) restaurantFilter.city = new RegExp(`^${city}$`, 'i');
+    const restaurantIds = await Restaurant.find(restaurantFilter).distinct('_id');
+
+    const filter = { restaurant: { $in: restaurantIds }, isAvailable: true };
+    if (category) filter.category = category;
+    if (isVeg === 'true') filter.isVeg = true;
+    if (maxPrice) filter.price = { $lte: Number(maxPrice) };
+    if (search) filter.name = { $regex: search, $options: 'i' };
+
+    const sortMap = { priceLow: { price: 1 }, priceHigh: { price: -1 }, newest: { createdAt: -1 } };
+
+    const menuItems = await MenuItem.find(filter)
+      .populate('category', 'name')
+      .populate('restaurant', 'name city rating isOpen')
+      .sort(sortMap[sort] || sortMap.newest);
+
+    res.json({ success: true, count: menuItems.length, menuItems });
+  } catch (error) {
+    next(error);
+  }
 };
 
 const getMenuItemsByRestaurant = async (req, res, next) => {
@@ -194,6 +230,7 @@ module.exports = {
   createCategory,
   updateCategory,
   deleteCategory,
+  getMenuItems,
   getMenuItemsByRestaurant,
   getMenuItem,
   createMenuItem,
