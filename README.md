@@ -5,9 +5,9 @@ technically independent of) Zomato, Swiggy and Bhoj. No rider system, no
 real-time tracking — customers check order status by opening the order page,
 per the MVP spec.
 
-**Status: Steps 1–6 of 12 complete** — Project setup, database models,
-authentication, the Restaurant System, customer browsing, and the Cart are
-built and verified. See [Roadmap](#roadmap) below.
+**Status: Steps 1–7 of 12 complete** — Project setup, database models,
+authentication, the Restaurant System, customer browsing, Cart, and Checkout
+are built and verified. See [Roadmap](#roadmap) below.
 
 ## Tech stack
 
@@ -21,7 +21,7 @@ built and verified. See [Roadmap](#roadmap) below.
 - Role-based authorization (`CUSTOMER` / `RESTAURANT` / `ADMIN`) enforced on
   the backend — the frontend's route guards are just UX on top of that
 - All 9 MongoDB models (User, Restaurant, Category, MenuItem, Address, Order,
-  Payment, Review, Coupon) — notably, no Cart model, on purpose (see below)
+  Payment, Review, Coupon) — no Cart model, on purpose (see below)
 - Restaurant owners can create/edit restaurant profiles (with logo + cover
   image upload to Cloudinary) and manage **multiple** restaurants each — the
   seed data uses 3 owners across 10 restaurants, so this had to be a real
@@ -29,12 +29,14 @@ built and verified. See [Roadmap](#roadmap) below.
 - Full menu CRUD with categories, availability toggling, and photo upload
 - Customer browsing: home page, restaurant listing with search/filter/sort,
   restaurant detail pages with the live menu grouped by category, and a
-  Restaurants/Dishes tab (Section 18's two search modes) on the listing page
-- **A real, working cart**: add/remove, increment/decrement quantity, clear
-  cart, and restaurant validation (adding from a second restaurant prompts to
-  replace the cart rather than silently mixing orders). Client-side by
-  design — there's no `Cart` model, so it lives in Redux and localStorage
-  until Checkout turns it into a real `Order`
+  Restaurants/Dishes tab (Section 18's two search modes)
+- A real, working cart — add/remove, quantity, clear, restaurant validation
+- **Checkout is real, not a mockup**: saved-address management (add/edit/
+  delete/default), a coupon field that's validated against the actual
+  Coupon collection (expiry, usage limit, minimum order all enforced
+  server-side), and a total that's **calculated by the backend** from
+  current menu prices — not frontend arithmetic. Only "Place order" itself
+  is still a placeholder, since order creation is explicitly Step 8
 - A full demo dataset: 10 restaurants, 56 menu items, 12 categories, 3
   restaurant owners, 20 customers, 5 coupons — across all 6 target cities
 
@@ -142,8 +144,8 @@ Following Section 25's development order exactly:
 | 4 | Restaurant CRUD, menu CRUD, categories, restaurant dashboard | ✅ Done |
 | 5 | Customer home, restaurant listing/details, search, filters | ✅ Done |
 | 6 | Cart | ✅ Done |
-| 7 | Checkout (address, coupon, fees) | Next |
-| 8 | Orders (create, accept, prepare, ready, complete) | Planned |
+| 7 | Checkout (address, coupon, fees) | ✅ Done |
+| 8 | Orders (create, accept, prepare, ready, complete) | Next |
 | 9 | eSewa integration | Planned — will verify against current official docs before writing any endpoint code |
 | 10 | Reviews (completed orders only) | Planned |
 | 11 | Admin dashboard and management | Planned |
@@ -198,3 +200,21 @@ Following Section 25's development order exactly:
   spec doesn't force, and letting people build a cart before signing up is
   the more common pattern. Login becomes mandatory at Checkout (Step 7),
   since that's where a real, user-owned Order gets created.
+- `orderController.js`/`orderRoutes.js` exist a step early. Section 9's rule
+  ("the backend must calculate the final total") needs *some* backend math
+  at Checkout, so `POST /api/orders/preview` was built now — it prices
+  against live MenuItem/Coupon data and returns a breakdown, but creates
+  nothing. `calculateOrderTotal()` (utils, listed but previously unbuilt) is
+  written so Step 8's real order-creation endpoint reuses the exact same
+  function, in the same file, rather than duplicating the pricing logic.
+- `userService.js` isn't in the original service list, but Address CRUD
+  lives under `/api/users` (Section 13), and `userController.js`/
+  `userRoutes.js` already existed — a frontend service to call them was the
+  obviously-missing piece, same reasoning as `uploadImage.js` in Step 4.
+- The Address form skips latitude/longitude entirely. They're real fields on
+  the model, but there's no map picker in this MVP, and hand-typing raw
+  coordinates isn't something a customer would ever actually do.
+- Delivery fee (flat), service fee (2%), and tax (13%, Nepal's VAT rate) are
+  fixed constants in `calculateOrderTotal.js` for now — correct and
+  server-authoritative, just not yet configurable (e.g. distance-based
+  delivery pricing). That's a natural later extension, not a Step 7 rebuild.
