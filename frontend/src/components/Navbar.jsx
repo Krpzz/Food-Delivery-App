@@ -19,7 +19,10 @@ const Navbar = () => {
           Khaja<span className="text-marigold-500">Go</span>
         </Link>
 
-        <nav className="flex items-center gap-4">
+        <nav className="flex items-center gap-5">
+          <Link to="/restaurants" className="hidden font-sans text-sm text-ink/70 hover:text-ink sm:inline">
+            Restaurants
+          </Link>
           {user ? (
             <>
               <span className="hidden font-sans text-sm text-ink/70 sm:inline">
