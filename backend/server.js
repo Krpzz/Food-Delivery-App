@@ -10,7 +10,7 @@ const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
-const restaurantRoutes = require('./routes/restaurantRoutes');
+const restaurantRoutes = require('./routes/resturantRoutes');
 const menuRoutes = require('./routes/menuRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 
