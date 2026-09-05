@@ -12,12 +12,15 @@ import Restaurants from './pages/customer/Restaurants';
 import RestaurantDetails from './pages/customer/RestaurantDetails';
 import Cart from './pages/customer/Cart';
 import Checkout from './pages/customer/checkout';
-import Addresses from './pages/customer/addresses';
+import Addresses from './pages/customer/Addresses';
+import Orders from './pages/customer/Orders';
+import OrderDetails from './pages/customer/OrderDetails';
 import RestaurantDashboard from './pages/restaurant/Dashboard';
 import RestaurantProfile from './pages/restaurant/Profile';
 import RestaurantMenu from './pages/restaurant/Menu';
 import AddMenuItem from './pages/restaurant/AddMenuItem';
 import EditMenuItem from './pages/restaurant/EditMenuItem';
+import RestaurantOrders from './pages/restaurant/orders';
 import AdminDashboard from './pages/admin/Dashboard';
 
 function App() {
@@ -47,6 +50,22 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/orders"
+          element={
+            <ProtectedRoute>
+              <Orders />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/orders/:id"
+          element={
+            <ProtectedRoute>
+              <OrderDetails />
+            </ProtectedRoute>
+          }
+        />
       </Route>
 
       <Route
@@ -62,6 +81,7 @@ function App() {
         <Route path="menu" element={<RestaurantMenu />} />
         <Route path="menu/add" element={<AddMenuItem />} />
         <Route path="menu/:id/edit" element={<EditMenuItem />} />
+        <Route path="orders" element={<RestaurantOrders />} />
       </Route>
 
       <Route
