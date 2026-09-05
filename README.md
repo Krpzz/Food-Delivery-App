@@ -1,9 +1,5 @@
-# KhajaGo — Food Delivery Marketplace (Nepal MVP)
+# Food Delivery Marketplace (Nepal MVP)
 
-A MERN food delivery marketplace for Nepal, inspired by (but visually and
-technically independent of) Zomato, Swiggy and Bhoj. No rider system, no
-real-time tracking — customers check order status by opening the order page,
-per the MVP spec.
 
 **Status: Steps 1–7 of 12 complete** — Project setup, database models,
 authentication, the Restaurant System, customer browsing, Cart, and Checkout
@@ -145,7 +141,7 @@ Following Section 25's development order exactly:
 | 5 | Customer home, restaurant listing/details, search, filters | ✅ Done |
 | 6 | Cart | ✅ Done |
 | 7 | Checkout (address, coupon, fees) | ✅ Done |
-| 8 | Orders (create, accept, prepare, ready, complete) | Next |
+| 8 | Orders (create, accept, prepare, ready, complete) | ✅ Done |
 | 9 | eSewa integration | Planned — will verify against current official docs before writing any endpoint code |
 | 10 | Reviews (completed orders only) | Planned |
 | 11 | Admin dashboard and management | Planned |

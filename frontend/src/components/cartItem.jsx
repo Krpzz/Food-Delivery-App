@@ -1,4 +1,4 @@
-import { getItemEffectivePrice } from '../utils/CartUtils';
+import { getItemEffectivePrice } from '../utils/cartUtils';
 
 const CartItem = ({ item, onIncrement, onDecrement, onRemove }) => {
   const effectivePrice = getItemEffectivePrice(item);
