@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../store/slices/authSlice';
-import { getCartItemCount } from '../utils/CartUtils';
+import { getCartItemCount } from '../utils/cartUtils';
 
 const Navbar = () => {
   const { user } = useSelector((state) => state.auth);
@@ -36,6 +36,9 @@ const Navbar = () => {
           </Link>
           {user ? (
             <>
+              <Link to="/orders" className="hidden font-sans text-sm text-ink/70 hover:text-ink sm:inline">
+                Orders
+              </Link>
               <span className="hidden font-sans text-sm text-ink/70 sm:inline">
                 Hi, {user.name.split(' ')[0]}
               </span>
