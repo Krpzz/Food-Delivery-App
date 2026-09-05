@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
 import userService from '../../services/userService';
 import orderService from '../../services/orderService';
-import AddressForm from './addresses';
+import AddressForm from '../../components/AddressForm';
 import Loading from '../../components/Loading';
+import { clearCart } from '../../store/slices/cartSlice';
 
 const TotalRow = ({ label, value }) => (
   <div className="flex justify-between font-sans text-sm text-ink/70">
@@ -14,6 +15,8 @@ const TotalRow = ({ label, value }) => (
 );
 
 const Checkout = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { items, restaurantId, restaurantName } = useSelector((s) => s.cart);
 
   const [addresses, setAddresses] = useState([]);
@@ -27,6 +30,8 @@ const Checkout = () => {
   const [isCalculating, setIsCalculating] = useState(false);
 
   const [paymentMethod, setPaymentMethod] = useState('COD');
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [placeOrderError, setPlaceOrderError] = useState('');
 
   useEffect(() => {
     userService
@@ -62,6 +67,29 @@ const Checkout = () => {
   }, []);
 
   const handleApplyCoupon = () => fetchPreview(couponCode);
+
+  const handlePlaceOrder = async () => {
+    if (!selectedAddressId) {
+      setPlaceOrderError('Select a delivery address first.');
+      return;
+    }
+    setIsPlacingOrder(true);
+    setPlaceOrderError('');
+    try {
+      const data = await orderService.createOrder({
+        restaurantId,
+        items: items.map((i) => ({ menuItemId: i.menuItemId, quantity: i.quantity })),
+        addressId: selectedAddressId,
+        couponCode: preview?.coupon?.code || undefined,
+        paymentMethod,
+      });
+      dispatch(clearCart());
+      navigate(`/orders/${data.order._id}`);
+    } catch (err) {
+      setPlaceOrderError(err.response?.data?.message || 'Could not place your order');
+      setIsPlacingOrder(false);
+    }
+  };
 
   if (items.length === 0) {
     return (
@@ -225,12 +253,17 @@ const Checkout = () => {
         )}
       </section>
 
+      {placeOrderError && (
+        <p className="mt-4 rounded-lg bg-chili-500/10 px-3 py-2 font-sans text-sm text-chili-600">{placeOrderError}</p>
+      )}
+
       <button
-        disabled
-        title="Order placement arrives in Step 8"
-        className="mt-6 w-full cursor-not-allowed rounded-lg bg-ink/10 py-3 font-sans text-sm text-ink/40"
+        onClick={handlePlaceOrder}
+        disabled={isPlacingOrder || paymentMethod === 'ESEWA' || !selectedAddressId || !preview}
+        title={paymentMethod === 'ESEWA' ? 'eSewa arrives in Step 9 - choose Cash on Delivery for now' : undefined}
+        className="mt-6 w-full rounded-lg bg-indigo-600 py-3 font-sans text-sm text-paper hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-ink/10 disabled:text-ink/40"
       >
-        Place order — Step 8
+        {isPlacingOrder ? 'Placing order…' : 'Place order'}
       </button>
     </div>
   );
