@@ -4,6 +4,7 @@ import { logout } from '../store/slices/authSlice';
 
 const navItems = [
   { label: 'Dashboard', to: '/restaurant/dashboard' },
+  { label: 'Orders', to: '/restaurant/orders' },
   { label: 'Menu', to: '/restaurant/menu' },
   { label: 'Profile', to: '/restaurant/profile' },
 ];
