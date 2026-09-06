@@ -1,69 +1,85 @@
 const crypto = require('crypto');
+const Order = require('../models/Order');
+const Payment = require('../models/Payment');
+const {
+  buildPaymentPayload,
+  decodeCallbackData,
+  verifyResponseSignature,
+  checkTransactionStatus,
+} = require('../services/esewaService');
 
-const FORM_URL = process.env.ESEWA_BASE_URL;
-const STATUS_CHECK_URL = process.env.ESEWA_STATUS_CHECK_URL;
+const initiateEsewaPayment = async (req, res, next) => {
+  try {
+    const order = await Order.findOne({ _id: req.body.orderId, customer: req.user._id }).populate('payment');
+    if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
+    if (order.paymentMethod !== 'ESEWA' || order.status !== 'PENDING_PAYMENT') {
+      return res.status(400).json({ success: false, message: 'This order is not awaiting eSewa payment' });
+    }
 
-const sign = (message) => crypto.createHmac('sha256', process.env.ESEWA_SECRET_KEY).update(message).digest('base64');
+    const transactionUuid = `${order.orderNumber}-${Date.now()}`;
+    order.payment.transactionId = transactionUuid;
+    await order.payment.save();
 
-const buildSignedMessage = (fields, signedFieldNames) =>
-  signedFieldNames.map((name) => `${name}=${fields[name]}`).join(',');
+    const payment = buildPaymentPayload({
+      amount: order.subtotal,
+      taxAmount: order.tax,
+      serviceCharge: order.serviceFee,
+      deliveryCharge: order.deliveryFee,
+      totalAmount: order.total,
+      transactionUuid,
+      successUrl: process.env.ESEWA_SUCCESS_URL,
+      failureUrl: process.env.ESEWA_FAILURE_URL,
+    });
 
-const buildPaymentPayload = ({
-  amount,
-  taxAmount,
-  serviceCharge,
-  deliveryCharge,
-  totalAmount,
-  transactionUuid,
-  successUrl,
-  failureUrl,
-}) => {
-  const signedFieldNames = ['total_amount', 'transaction_uuid', 'product_code'];
-
-  const fields = {
-    amount: String(amount),
-    tax_amount: String(taxAmount),
-    total_amount: String(totalAmount),
-    transaction_uuid: transactionUuid,
-    product_code: process.env.ESEWA_MERCHANT_CODE,
-    product_service_charge: String(serviceCharge),
-    product_delivery_charge: String(deliveryCharge),
-    success_url: successUrl,
-    failure_url: failureUrl,
-  };
-
-  const signature = sign(buildSignedMessage(fields, signedFieldNames));
-
-  return {
-    formUrl: FORM_URL,
-    fields: {
-      ...fields,
-      signed_field_names: signedFieldNames.join(','),
-      signature,
-    },
-  };
-};
-
-const decodeCallbackData = (base64Data) => JSON.parse(Buffer.from(base64Data, 'base64').toString('utf-8'));
-
-const verifyResponseSignature = (decoded) => {
-  const signedFieldNames = decoded.signed_field_names.split(',');
-  const expected = sign(buildSignedMessage(decoded, signedFieldNames));
-  return expected === decoded.signature;
-};
-
-const checkTransactionStatus = async ({ productCode, totalAmount, transactionUuid }) => {
-  const url = `${STATUS_CHECK_URL}?product_code=${encodeURIComponent(productCode)}&total_amount=${encodeURIComponent(totalAmount)}&transaction_uuid=${encodeURIComponent(transactionUuid)}`;
-  const response = await fetch(url);
-  if (!response.ok) {
-    const err = new Error('Could not reach eSewa to verify this payment');
-    err.statusCode = 502;
-    throw err;
+    res.json({ success: true, ...payment });
+  } catch (error) {
+    next(error);
   }
-  return response.json();
+};
+
+const verifyEsewaPayment = async (req, res, next) => {
+  try {
+    const decoded = decodeCallbackData(req.body.data);
+    if (!verifyResponseSignature(decoded)) {
+      return res.status(400).json({ success: false, message: 'Invalid payment signature' });
+    }
+
+    const payment = await Payment.findOne({ transactionId: decoded.transaction_uuid }).populate('order');
+    if (!payment || payment.order.customer.toString() !== req.user._id.toString()) {
+      return res.status(404).json({ success: false, message: 'Payment not found' });
+    }
+    if (payment.status === 'SUCCESS') return res.json({ success: true, order: payment.order });
+    if (Number(decoded.total_amount) !== payment.amount) {
+      return res.status(400).json({ success: false, message: 'Payment amount does not match the order' });
+    }
+
+    const status = await checkTransactionStatus({
+      productCode: decoded.product_code,
+      totalAmount: decoded.total_amount,
+      transactionUuid: decoded.transaction_uuid,
+    });
+    if (status.status !== 'COMPLETE') {
+      payment.status = 'FAILED';
+      await payment.save();
+      payment.order.status = 'PAYMENT_FAILED';
+      await payment.order.save();
+      return res.status(400).json({ success: false, message: 'eSewa payment was not completed' });
+    }
+
+    payment.status = 'SUCCESS';
+    payment.paidAt = new Date();
+    await payment.save();
+    payment.order.status = 'CONFIRMED';
+    await payment.order.save();
+    res.json({ success: true, order: payment.order });
+  } catch (error) {
+    next(error);
+  }
 };
 
 module.exports = {
+  initiateEsewaPayment,
+  verifyEsewaPayment,
   buildPaymentPayload,
   decodeCallbackData,
   verifyResponseSignature,
