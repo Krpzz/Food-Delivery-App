@@ -1,106 +1,71 @@
 const crypto = require('crypto');
 
-const generateEsewaSignature = (
-    totalAmount,
-    transactionUuid,
-    productCode
-) => {
-    const message =
-        `total_amount=${totalAmount},transaction_uuid=${transactionUuid},product_code=${productCode}`;
+const FORM_URL = process.env.ESEWA_BASE_URL;
+const STATUS_CHECK_URL = process.env.ESEWA_STATUS_CHECK_URL;
 
-    return crypto
-        .createHmac(
-            "sha256",
-            process.env.ESEWA_SECRET_KEY
-        )
-        .update(message)
-        .digest("base64");
+const sign = (message) => crypto.createHmac('sha256', process.env.ESEWA_SECRET_KEY).update(message).digest('base64');
+
+const buildSignedMessage = (fields, signedFieldNames) =>
+  signedFieldNames.map((name) => `${name}=${fields[name]}`).join(',');
+
+const buildPaymentPayload = ({
+  amount,
+  taxAmount,
+  serviceCharge,
+  deliveryCharge,
+  totalAmount,
+  transactionUuid,
+  successUrl,
+  failureUrl,
+}) => {
+  const signedFieldNames = ['total_amount', 'transaction_uuid', 'product_code'];
+
+  const fields = {
+    amount: String(amount),
+    tax_amount: String(taxAmount),
+    total_amount: String(totalAmount),
+    transaction_uuid: transactionUuid,
+    product_code: process.env.ESEWA_MERCHANT_CODE,
+    product_service_charge: String(serviceCharge),
+    product_delivery_charge: String(deliveryCharge),
+    success_url: successUrl,
+    failure_url: failureUrl,
+  };
+
+  const signature = sign(buildSignedMessage(fields, signedFieldNames));
+
+  return {
+    formUrl: FORM_URL,
+    fields: {
+      ...fields,
+      signed_field_names: signedFieldNames.join(','),
+      signature,
+    },
+  };
 };
 
-const esewaSuccess = async (req, res) => {
-    try {
-        console.log("eSewa success response:", req.body);
+const decodeCallbackData = (base64Data) => JSON.parse(Buffer.from(base64Data, 'base64').toString('utf-8'));
 
-        res.json({
-            message: "eSewa payment successful",
-            data: req.body
-        });
-
-    } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
-    }
+const verifyResponseSignature = (decoded) => {
+  const signedFieldNames = decoded.signed_field_names.split(',');
+  const expected = sign(buildSignedMessage(decoded, signedFieldNames));
+  return expected === decoded.signature;
 };
 
-const esewaFailure = async (req, res) => {
-    try {
-        console.log("eSewa payment failed:", req.body);
-
-        res.json({
-            message: "eSewa payment failed",
-            data: req.body
-        });
-
-    } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
-    }
-};
-
-const initiateEsewaPayment = async (req, res) => {
-    try {
-        const { amount } = req.body;
-
-        const transactionUuid =
-            `BITE24-${Date.now()}`;
-
-        const productCode =
-            process.env.ESEWA_MERCHANT_CODE;
-
-        const totalAmount = Number(amount);
-
-        const signature =
-            generateEsewaSignature(
-                totalAmount,
-                transactionUuid,
-                productCode
-            );
-
-        res.json({
-            amount: totalAmount,
-            tax_amount: 0,
-            total_amount: totalAmount,
-
-            transaction_uuid: transactionUuid,
-
-            product_code: productCode,
-
-            product_service_charge: 0,
-            product_delivery_charge: 0,
-
-            signed_field_names:
-                "total_amount,transaction_uuid,product_code",
-
-            signature,
-
-            success_url:
-                "http://localhost:5000/api/payment/esewa/success",
-
-            failure_url:
-                "http://localhost:5000/api/payment/esewa/failure"
-        });
-
-    } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
-    }
+const checkTransactionStatus = async ({ productCode, totalAmount, transactionUuid }) => {
+  const url = `${STATUS_CHECK_URL}?product_code=${encodeURIComponent(productCode)}&total_amount=${encodeURIComponent(totalAmount)}&transaction_uuid=${encodeURIComponent(transactionUuid)}`;
+  const response = await fetch(url);
+  if (!response.ok) {
+    const err = new Error('Could not reach eSewa to verify this payment');
+    err.statusCode = 502;
+    throw err;
+  }
+  return response.json();
 };
 
 module.exports = {
-    esewaSuccess,
-    esewaFailure,
-    initiateEsewaPayment
+  buildPaymentPayload,
+  decodeCallbackData,
+  verifyResponseSignature,
+  checkTransactionStatus,
 };
