@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import userService from '../../services/userService';
 import orderService from '../../services/orderService';
+import paymentService from '../../services/paymentService';
 import AddressForm from '../../components/AddressForm';
 import Loading from '../../components/Loading';
 import { clearCart } from '../../store/slices/cartSlice';
@@ -13,6 +14,21 @@ const TotalRow = ({ label, value }) => (
     <span>NPR {value}</span>
   </div>
 );
+
+const submitEsewaForm = (actionUrl, fields) => {
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = actionUrl;
+  Object.entries(fields).forEach(([name, value]) => {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = name;
+    input.value = value;
+    form.appendChild(input);
+  });
+  document.body.appendChild(form);
+  form.submit();
+};
 
 const Checkout = () => {
   const dispatch = useDispatch();
@@ -83,6 +99,14 @@ const Checkout = () => {
         couponCode: preview?.coupon?.code || undefined,
         paymentMethod,
       });
+
+      if (paymentMethod === 'ESEWA') {
+        const paymentData = await paymentService.initiateEsewaPayment(data.order._id);
+        dispatch(clearCart());
+        submitEsewaForm(paymentData.formUrl, paymentData.fields);
+        return;
+      }
+
       dispatch(clearCart());
       navigate(`/orders/${data.order._id}`);
     } catch (err) {
@@ -228,9 +252,6 @@ const Checkout = () => {
             </button>
           ))}
         </div>
-        {paymentMethod === 'ESEWA' && (
-          <p className="mt-2 font-sans text-xs text-marigold-600">eSewa payment processing arrives in Step 9.</p>
-        )}
       </section>
 
       <section className="mt-8 space-y-2 border-t border-ink/10 pt-6">
@@ -259,11 +280,10 @@ const Checkout = () => {
 
       <button
         onClick={handlePlaceOrder}
-        disabled={isPlacingOrder || paymentMethod === 'ESEWA' || !selectedAddressId || !preview}
-        title={paymentMethod === 'ESEWA' ? 'eSewa arrives in Step 9 - choose Cash on Delivery for now' : undefined}
+        disabled={isPlacingOrder || !selectedAddressId || !preview}
         className="mt-6 w-full rounded-lg bg-indigo-600 py-3 font-sans text-sm text-paper hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-ink/10 disabled:text-ink/40"
       >
-        {isPlacingOrder ? 'Placing order…' : 'Place order'}
+        {isPlacingOrder ? (paymentMethod === 'ESEWA' ? 'Redirecting to eSewa…' : 'Placing order…') : 'Place order'}
       </button>
     </div>
   );
