@@ -1,24 +1,10 @@
 const express = require('express');
-const {
-    esewaSuccess,
-    esewaFailure,
-    initiateEsewaPayment
-} = require('../controllers/paymentController');
+const { protect } = require('../middleware/authMiddleware');
+const { initiateEsewaPayment, verifyEsewaPayment } = require('../controllers/paymentController');
 
 const router = express.Router();
 
-router.post(
-    "/esewa/initiate",
-    initiateEsewaPayment
-);
-router.get(
-    "/esewa/success",
-    esewaSuccess
-);
-
-router.get(
-    "/esewa/failure",
-    esewaFailure
-);
+router.post('/esewa/initiate', protect, initiateEsewaPayment);
+router.post('/esewa/verify', protect, verifyEsewaPayment);
 
 module.exports = router;

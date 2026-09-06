@@ -109,11 +109,6 @@ const createOrder = async (req, res, next) => {
     if (!['ESEWA', 'COD'].includes(paymentMethod)) {
       return res.status(400).json({ success: false, message: 'Invalid payment method' });
     }
-    if (paymentMethod === 'ESEWA') {
-      return res
-        .status(400)
-        .json({ success: false, message: 'eSewa checkout is not available yet. Select Cash on Delivery for now.' });
-    }
 
     const restaurant = await Restaurant.findOne({ _id: restaurantId, isApproved: true });
     if (!restaurant) {
@@ -186,7 +181,7 @@ const createOrder = async (req, res, next) => {
       coupon: coupon ? coupon._id : undefined,
       total: totals.total,
       paymentMethod,
-      status: 'CONFIRMED',
+      status: paymentMethod === 'COD' ? 'CONFIRMED' : 'PENDING_PAYMENT',
     });
 
     const payment = await Payment.create({
