@@ -12,17 +12,17 @@ import Restaurants from './pages/customer/Restaurants';
 import RestaurantDetails from './pages/customer/RestaurantDetails';
 import Cart from './pages/customer/Cart';
 import Checkout from './pages/customer/checkout';
-import Addresses from './pages/customer/Addresses';
+import Addresses from './pages/customer/addresses';
 import Orders from './pages/customer/Orders';
-import OrderDetails from './pages/customer/OrderDetails';
-import PaymentSuccess from './pages/customer/PaymentSuccess';
+import OrderDetails from './components/orderDetails';
+import PaymentSuccess from './pages/customer/PaymentSucess';
 import PaymentFailure from './pages/customer/PaymentFailure';
 import RestaurantDashboard from './pages/restaurant/Dashboard';
-import RestaurantProfile from './pages/restaurant/Profile';
-import RestaurantMenu from './pages/restaurant/Menu';
-import AddMenuItem from './pages/restaurant/AddMenuItem';
-import EditMenuItem from './pages/restaurant/EditMenuItem';
-import RestaurantOrders from './pages/restaurant/Orders';
+import RestaurantProfile from './pages/restaurant/profile';
+import RestaurantMenu from './pages/restaurant/menu';
+import AddMenuItem from './pages/restaurant/addMenuItem';
+import EditMenuItem from './pages/restaurant/editMenuItem';
+import RestaurantOrders from './pages/restaurant/orders';
 import AdminDashboard from './pages/admin/Dashboard';
 
 function App() {
