@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import orderService from '../services/orderService';
-import Loading from './Loading';
+import orderService from '../../services/orderService';
+import reviewService from '../../services/reviewService';
+import StarRating from '../../components/StarRating';
+import Loading from '../../components/Loading';
 
 const STATUS_FLOW = ['CONFIRMED', 'ACCEPTED', 'PREPARING', 'READY', 'COMPLETED'];
 const TERMINAL_STATUSES = ['CANCELLED', 'REJECTED', 'PAYMENT_FAILED'];
@@ -13,6 +15,12 @@ const OrderDetails = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [isCancelling, setIsCancelling] = useState(false);
+
+  const [myReview, setMyReview] = useState(undefined);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState('');
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [reviewError, setReviewError] = useState('');
 
   const load = () => {
     setIsLoading(true);
@@ -27,6 +35,12 @@ const OrderDetails = () => {
     load();
   }, [id]);
 
+  useEffect(() => {
+    if (order?.status === 'COMPLETED') {
+      reviewService.getMyReviewForOrder(order._id).then((data) => setMyReview(data.review));
+    }
+  }, [order]);
+
   const handleCancel = async () => {
     if (!window.confirm('Cancel this order?')) return;
     setIsCancelling(true);
@@ -37,6 +51,20 @@ const OrderDetails = () => {
       setError(err.response?.data?.message || 'Could not cancel this order');
     } finally {
       setIsCancelling(false);
+    }
+  };
+
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+    setIsSubmittingReview(true);
+    setReviewError('');
+    try {
+      const data = await reviewService.createReview({ orderId: order._id, rating: reviewRating, comment: reviewComment });
+      setMyReview(data.review);
+    } catch (err) {
+      setReviewError(err.response?.data?.message || 'Could not submit your review');
+    } finally {
+      setIsSubmittingReview(false);
     }
   };
 
@@ -139,6 +167,40 @@ const OrderDetails = () => {
         >
           {isCancelling ? 'Cancelling…' : 'Cancel order'}
         </button>
+      )}
+
+      {order.status === 'COMPLETED' && myReview !== undefined && (
+        <div className="mt-6 rounded-lg border border-ink/10 p-4">
+          <p className="font-sans text-sm font-medium text-ink">Your review</p>
+
+          {myReview ? (
+            <div className="mt-2">
+              <StarRating value={myReview.rating} />
+              {myReview.comment && <p className="mt-2 font-sans text-sm text-ink/70">{myReview.comment}</p>}
+            </div>
+          ) : (
+            <form onSubmit={handleSubmitReview} className="mt-3 space-y-3">
+              {reviewError && (
+                <p className="rounded-lg bg-chili-500/10 px-3 py-2 font-sans text-sm text-chili-600">{reviewError}</p>
+              )}
+              <StarRating value={reviewRating} onChange={setReviewRating} size="text-2xl" />
+              <textarea
+                value={reviewComment}
+                onChange={(e) => setReviewComment(e.target.value)}
+                placeholder="How was it? (optional)"
+                rows={3}
+                className="w-full rounded-lg border border-ink/15 bg-transparent px-3 py-2.5 font-sans text-sm text-ink outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              />
+              <button
+                type="submit"
+                disabled={isSubmittingReview}
+                className="rounded-lg bg-indigo-600 px-4 py-2 font-sans text-sm text-paper hover:bg-indigo-700 disabled:opacity-60"
+              >
+                {isSubmittingReview ? 'Submitting…' : 'Submit review'}
+              </button>
+            </form>
+          )}
+        </div>
       )}
     </div>
   );
