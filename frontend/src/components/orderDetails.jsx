@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import orderService from '../../services/orderService';
-import reviewService from '../../services/reviewService';
-import StarRating from '../../components/StarRating';
-import Loading from '../../components/Loading';
+import orderService from '../services/orderService';
+import reviewService from '../services/reviewService';
+import StarRating from './Starring';
+import Loading from './Loading';
 
 const STATUS_FLOW = ['CONFIRMED', 'ACCEPTED', 'PREPARING', 'READY', 'COMPLETED'];
 const TERMINAL_STATUSES = ['CANCELLED', 'REJECTED', 'PAYMENT_FAILED'];

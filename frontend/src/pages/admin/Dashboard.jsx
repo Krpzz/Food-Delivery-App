@@ -5,7 +5,7 @@ import { fetchMyRestaurants } from '../../store/slices/resturantSlice';
 import menuService from '../../services/menuService';
 import orderService from '../../services/orderService';
 import reviewService from '../../services/reviewService';
-import StarRating from '../../components/StarRating';
+import StarRating from '../../components/Starring';
 import Loading from '../../components/Loading';
 
 const RestaurantDashboard = () => {

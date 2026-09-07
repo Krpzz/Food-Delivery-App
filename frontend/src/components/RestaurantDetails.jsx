@@ -4,7 +4,7 @@ import restaurantService from '../../services/restaurantService';
 import menuService from '../../services/menuService';
 import reviewService from '../../services/reviewService';
 import FoodCard from '../../components/FoodCard';
-import StarRating from '../../components/StarRating';
+import StarRating from './Starring';
 import Loading from '../../components/Loading';
 
 const RestaurantDetails = () => {
