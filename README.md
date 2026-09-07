@@ -46,7 +46,7 @@ Following Section 25's development order exactly:
 | 7 | Checkout (address, coupon, fees) | ✅ Done |
 | 8 | Orders (create, accept, prepare, ready, complete) | ✅ Done |
 | 9 | eSewa integration | ✅ Done |
-| 10 | Reviews (completed orders only) | Next |
+| 10 | Reviews (completed orders only) | ✅ Done |
 | 11 | Admin dashboard and management | Planned |
 | 12 | Full-flow testing | Planned |
 
