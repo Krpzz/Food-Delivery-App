@@ -2,9 +2,6 @@ const { validationResult } = require('express-validator');
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
 
-// Section 20 says never trust the frontend for `role`. Self-registration is
-// only ever allowed to create a CUSTOMER or RESTAURANT account. ADMIN accounts
-// are never created through this public endpoint — only via the seed script.
 const ALLOWED_SELF_REGISTER_ROLES = ['CUSTOMER', 'RESTAURANT'];
 
 const register = async (req, res, next) => {

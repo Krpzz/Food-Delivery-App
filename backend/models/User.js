@@ -12,8 +12,6 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
     phone: { type: String, required: true, trim: true },
-    // select: false -> password is never returned by default queries.
-    // Controllers must explicitly .select('+password') when they need it (e.g. login).
     password: { type: String, required: true, minlength: 6, select: false },
     role: {
       type: String,
@@ -36,8 +34,6 @@ userSchema.methods.comparePassword = function comparePassword(candidate) {
   return bcrypt.compare(candidate, this.password);
 };
 
-// Belt-and-suspenders: even if a query somewhere forgets to exclude it,
-// password never leaks through JSON serialization.
 userSchema.set('toJSON', {
   transform: (_doc, ret) => {
     delete ret.password;

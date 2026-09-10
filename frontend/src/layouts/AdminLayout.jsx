@@ -3,10 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../store/slices/authSlice';
 
-// Only "Dashboard" is wired up in this phase. The rest of Section 5's admin
-// pages (Users, Restaurants, Orders, Categories, Coupons) get their own nav
-// entries as each is built in Step 11, rather than linking to pages that
-// don't exist yet.
 const navItems = [{ label: 'Dashboard', to: '/admin/dashboard' }];
 
 const AdminLayout = () => {

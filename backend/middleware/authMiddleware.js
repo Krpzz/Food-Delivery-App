@@ -1,8 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-// Verifies the Bearer token and attaches the full user document to req.user.
-// Every protected route in the app depends on this running first.
 const protect = async (req, res, next) => {
   try {
     let token;

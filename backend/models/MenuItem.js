@@ -12,7 +12,6 @@ const menuItemSchema = new mongoose.Schema(
     description: { type: String, default: '' },
     image: { type: String, default: '' },
     price: { type: Number, required: true, min: 0 },
-    // Percentage discount, 0-100.
     discount: { type: Number, default: 0, min: 0, max: 100 },
     isAvailable: { type: Boolean, default: true },
     isVeg: { type: Boolean, default: true },

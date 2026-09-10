@@ -12,8 +12,6 @@ const restaurantSchema = new mongoose.Schema(
     latitude: { type: Number },
     longitude: { type: Number },
     phone: { type: String, required: true },
-    // Not in the original field list, but Section 18 requires filtering/sorting
-    // by cuisine, so the model needs somewhere to store it.
     cuisines: { type: [String], default: [] },
     openingTime: { type: String, default: '10:00' },
     closingTime: { type: String, default: '21:00' },

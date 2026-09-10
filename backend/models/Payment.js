@@ -9,7 +9,6 @@ const paymentSchema = new mongoose.Schema(
       enum: ['PENDING', 'SUCCESS', 'FAILED', 'REFUNDED'],
       default: 'PENDING',
     },
-    // eSewa transaction/reference ID. Used to prevent duplicate payment processing.
     transactionId: { type: String, default: '' },
     amount: { type: Number, required: true },
     paidAt: { type: Date },

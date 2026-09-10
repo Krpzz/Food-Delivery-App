@@ -30,12 +30,10 @@ const RestaurantProfile = () => {
   const [formData, setFormData] = useState(emptyForm);
   const [logoFile, setLogoFile] = useState(null);
   const [coverFile, setCoverFile] = useState(null);
-  const [mode, setMode] = useState('create'); // 'create' | 'edit'
+  const [mode, setMode] = useState('create');
   const [submitting, setSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
 
-  // Guards the one-time "default to edit mode if restaurants already exist"
-  // decision so it doesn't fight the user clicking "+ Add restaurant" later.
   const hasInitialized = useRef(false);
 
   useEffect(() => {

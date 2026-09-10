@@ -6,7 +6,6 @@ const { protect } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-// Brute-force protection specifically on login, on top of the global limiter in server.js.
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,

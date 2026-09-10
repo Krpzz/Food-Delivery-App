@@ -75,7 +75,7 @@ const createRestaurant = async (req, res, next) => {
     }
 
     const restaurant = await Restaurant.create({
-      owner: req.user._id, // never trust a client-supplied owner (Section 20)
+      owner: req.user._id,
       name,
       description,
       address,

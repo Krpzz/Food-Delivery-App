@@ -8,7 +8,6 @@ const inputClass =
   'mt-1.5 w-full rounded-lg border border-ink/15 bg-transparent px-3 py-2.5 font-sans text-ink outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500';
 const labelClass = 'block font-sans text-sm text-ink/70';
 
-// mode: 'create' | 'edit'. In edit mode, pass the existing menu item as initialData.
 const MenuItemForm = ({ mode, initialData }) => {
   const navigate = useNavigate();
   const { activeRestaurantId } = useSelector((s) => s.restaurant);
