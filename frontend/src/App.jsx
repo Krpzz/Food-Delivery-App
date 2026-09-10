@@ -1,9 +1,11 @@
+import { Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
 import CustomerLayout from './layouts/CustomerLayout';
 import AdminLayout from './layouts/AdminLayout';
 import RestaurantLayout from './layouts/RestaurantLayout';
 import ProtectedRoute from './components/ProtectedRoute';
+import Loading from './components/Loading';
 
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
@@ -11,19 +13,25 @@ import Home from './pages/customer/Home';
 import Restaurants from './pages/customer/Restaurants';
 import RestaurantDetails from './pages/customer/RestaurantDetails';
 import Cart from './pages/customer/Cart';
-import Checkout from './pages/customer/checkout';
-import Addresses from './pages/customer/addresses';
+import Checkout from './pages/customer/Checkout';
+import Addresses from './pages/customer/Addresses';
 import Orders from './pages/customer/Orders';
-import OrderDetails from './components/orderDetails';
-import PaymentSuccess from './pages/customer/PaymentSucess';
+import OrderDetails from './pages/customer/OrderDetails';
+import PaymentSuccess from './pages/customer/PaymentSuccess';
 import PaymentFailure from './pages/customer/PaymentFailure';
 import RestaurantDashboard from './pages/restaurant/Dashboard';
 import RestaurantProfile from './pages/restaurant/profile';
-import RestaurantMenu from './pages/restaurant/menu';
-import AddMenuItem from './pages/restaurant/addMenuItem';
-import EditMenuItem from './pages/restaurant/editMenuItem';
-import RestaurantOrders from './pages/restaurant/orders';
-import AdminDashboard from './pages/admin/Dashboard';
+import RestaurantMenu from './pages/restaurant/Menu';
+import AddMenuItem from './pages/restaurant/AddMenuItem';
+import EditMenuItem from './pages/restaurant/EditMenuItem';
+import RestaurantOrders from './pages/restaurant/Orders';
+import AdminRestaurants from './pages/admin/Restaurants';
+import AdminUsers from './pages/admin/Users';
+import AdminOrders from './pages/admin/Orders';
+import AdminCategories from './pages/admin/Categories';
+import AdminCoupons from './pages/admin/Coupons';
+
+const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'));
 
 function App() {
   return (
@@ -110,7 +118,19 @@ function App() {
           </ProtectedRoute>
         }
       >
-        <Route path="dashboard" element={<AdminDashboard />} />
+        <Route
+          path="dashboard"
+          element={
+            <Suspense fallback={<Loading label="Loading dashboard" />}>
+              <AdminDashboard />
+            </Suspense>
+          }
+        />
+        <Route path="restaurants" element={<AdminRestaurants />} />
+        <Route path="users" element={<AdminUsers />} />
+        <Route path="orders" element={<AdminOrders />} />
+        <Route path="categories" element={<AdminCategories />} />
+        <Route path="coupons" element={<AdminCoupons />} />
       </Route>
     </Routes>
   );
