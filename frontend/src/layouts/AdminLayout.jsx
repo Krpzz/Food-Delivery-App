@@ -1,9 +1,15 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import { logout } from '../store/slices/authSlice';
 
-const navItems = [{ label: 'Dashboard', to: '/admin/dashboard' }];
+const navItems = [
+  { label: 'Dashboard', to: '/admin/dashboard' },
+  { label: 'Restaurants', to: '/admin/restaurants' },
+  { label: 'Users', to: '/admin/users' },
+  { label: 'Orders', to: '/admin/orders' },
+  { label: 'Categories', to: '/admin/categories' },
+  { label: 'Coupons', to: '/admin/coupons' },
+];
 
 const AdminLayout = () => {
   const { user } = useSelector((state) => state.auth);
@@ -32,9 +38,7 @@ const AdminLayout = () => {
                 to={item.to}
                 className={({ isActive }) =>
                   `rounded-lg px-3 py-2 font-sans text-sm transition-colors ${
-                    isActive
-                      ? 'bg-indigo-700 text-paper'
-                      : 'text-paper/70 hover:bg-indigo-700/60 hover:text-paper'
+                    isActive ? 'bg-indigo-700 text-paper' : 'text-paper/70 hover:bg-indigo-700/60 hover:text-paper'
                   }`
                 }
               >
@@ -42,18 +46,11 @@ const AdminLayout = () => {
               </NavLink>
             ))}
           </nav>
-          <p className="mt-6 px-6 font-sans text-xs leading-relaxed text-paper/40">
-            More sections (users, restaurants, orders, categories, coupons)
-            unlock as Steps 4–11 are built.
-          </p>
         </div>
 
         <div className="border-t border-paper/10 px-6 py-4">
           <p className="truncate font-sans text-sm text-paper/80">{user?.name}</p>
-          <button
-            onClick={handleLogout}
-            className="mt-2 font-sans text-xs text-paper/50 hover:text-paper"
-          >
+          <button onClick={handleLogout} className="mt-2 font-sans text-xs text-paper/50 hover:text-paper">
             Log out
           </button>
         </div>
