@@ -106,6 +106,7 @@ const run = async () => {
         phone: '9800000000',
         password: process.env.SEED_ADMIN_PASSWORD || 'ChangeMe123!',
         role: 'ADMIN',
+        isActive: true,
       });
       console.log(`Admin created: ${admin.email}`);
     } else {
@@ -121,7 +122,7 @@ const run = async () => {
  
     const ownerDocs = [];
     for (const owner of OWNERS) {
-      ownerDocs.push(await User.create({ ...owner, password: DEFAULT_PASSWORD, role: 'RESTAURANT' }));
+      ownerDocs.push(await User.create({ ...owner, password: DEFAULT_PASSWORD, role: 'RESTAURANT', isActive: true }));
     }
     console.log(`Created ${ownerDocs.length} restaurant owners`);
  
@@ -134,6 +135,7 @@ const run = async () => {
         phone: `98${(10000000 + i).toString().slice(0, 8)}`,
         password: DEFAULT_PASSWORD,
         role: 'CUSTOMER',
+        isActive: true,
       });
     }
     console.log('Created 20 customers');
