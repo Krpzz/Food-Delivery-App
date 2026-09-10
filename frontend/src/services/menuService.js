@@ -15,6 +15,16 @@ const createCategory = async (formData) => {
   return data;
 };
 
+const updateCategory = async (id, formData) => {
+  const { data } = await api.put(`/menu/categories/${id}`, formData);
+  return data;
+};
+
+const deleteCategory = async (id) => {
+  const { data } = await api.delete(`/menu/categories/${id}`);
+  return data;
+};
+
 const getMenuItemsByRestaurant = async (restaurantId, params = {}) => {
   const { data } = await api.get(`/menu/restaurant/${restaurantId}`, { params });
   return data;
@@ -43,10 +53,12 @@ const deleteMenuItem = async (id) => {
 export default {
   getCategories,
   createCategory,
+  updateCategory,
+  deleteCategory,
   getMenuItems,
   getMenuItemsByRestaurant,
   getMenuItem,
   createMenuItem,
   updateMenuItem,
   deleteMenuItem,
-};
+};2
