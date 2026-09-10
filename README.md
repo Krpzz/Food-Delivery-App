@@ -47,7 +47,7 @@ Following Section 25's development order exactly:
 | 8 | Orders (create, accept, prepare, ready, complete) | ✅ Done |
 | 9 | eSewa integration | ✅ Done |
 | 10 | Reviews (completed orders only) | ✅ Done |
-| 11 | Admin dashboard and management | Planned |
+| 11 | Admin dashboard and management | ✅ Done |
 | 12 | Full-flow testing | Planned |
 
 #
