@@ -8,12 +8,15 @@
 // an existing admin instead of creating a second one.
 
 require('dotenv').config();
+const dns = require('dns');
 const mongoose = require('mongoose');
 const User = require('../models/User');
 const Restaurant = require('../models/Restaurant');
 const Category = require('../models/Category');
 const MenuItem = require('../models/MenuItem');
 const Coupon = require('../models/Coupon');
+
+dns.setServers(['1.1.1.1', '1.0.0.1']);
 
 const CATEGORY_NAMES = [
   'Momo',
