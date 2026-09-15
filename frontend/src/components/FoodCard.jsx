@@ -1,8 +1,16 @@
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { addItem, incrementItem, decrementItem, clearCart } from '../store/slices/cartSlice';
-import { getItemEffectivePrice } from '../utils/CartUtils';
+import { getItemEffectivePrice } from '../utils/cartUtils';
 
+// showRestaurant: true when this card appears in cross-restaurant dish search
+// results (Restaurants.jsx "Dishes" tab), where the customer needs to know
+// which restaurant it belongs to before they can order it.
+//
+// restaurantId/restaurantName: passed explicitly when the card is rendered
+// from a single restaurant's menu (RestaurantDetails.jsx), where the item
+// itself doesn't carry a populated `restaurant` object. Falls back to
+// item.restaurant when it does (cross-restaurant search).
 const FoodCard = ({ item, showRestaurant = false, restaurantId, restaurantName }) => {
   const dispatch = useDispatch();
   const cart = useSelector((s) => s.cart);

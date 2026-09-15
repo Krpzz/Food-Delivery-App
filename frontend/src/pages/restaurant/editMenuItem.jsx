@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import menuService from '../../services/menuService';
-import MenuItemForm from './menuItemForm';
+import MenuItemForm from '../../components/MenuItemForm';
 import Loading from '../../components/Loading';
 
 const EditMenuItem = () => {

@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import restaurantService from '../../services/resturantService';
+import restaurantService from '../../services/restaurantService';
 import menuService from '../../services/menuService';
+import reviewService from '../../services/reviewService';
 import FoodCard from '../../components/FoodCard';
+import StarRating from '../../components/StarRating';
 import Loading from '../../components/Loading';
 
 const RestaurantDetails = () => {
   const { id } = useParams();
   const [restaurant, setRestaurant] = useState(null);
   const [items, setItems] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const [activeCategory, setActiveCategory] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -17,10 +20,15 @@ const RestaurantDetails = () => {
     setIsLoading(true);
     setError('');
     setActiveCategory('all');
-    Promise.all([restaurantService.getRestaurantById(id), menuService.getMenuItemsByRestaurant(id, { availableOnly: 'true' })])
-      .then(([restaurantData, menuData]) => {
+    Promise.all([
+      restaurantService.getRestaurantById(id),
+      menuService.getMenuItemsByRestaurant(id, { availableOnly: 'true' }),
+      reviewService.getRestaurantReviews(id),
+    ])
+      .then(([restaurantData, menuData, reviewData]) => {
         setRestaurant(restaurantData.restaurant);
         setItems(menuData.menuItems);
+        setReviews(reviewData.reviews);
       })
       .catch((err) => setError(err.response?.data?.message || 'Restaurant not found'))
       .finally(() => setIsLoading(false));
@@ -61,7 +69,10 @@ const RestaurantDetails = () => {
             <p className="mt-1 font-sans text-sm text-ink/60">{restaurant.cuisines?.join(' · ')}</p>
           </div>
           <div className="flex items-center gap-2">
-            <span className="flex items-center gap-1 font-sans text-sm text-ink">★ {restaurant.rating?.toFixed(1) ?? '—'}</span>
+            <span className="flex items-center gap-1 font-sans text-sm text-ink">
+              ★ {restaurant.rating?.toFixed(1) ?? '—'}
+              {restaurant.ratingCount > 0 && <span className="text-ink/40">({restaurant.ratingCount})</span>}
+            </span>
             <span
               className={`rounded-full px-2.5 py-0.5 font-sans text-xs ${
                 restaurant.isOpen ? 'bg-green-100 text-green-700' : 'bg-ink/10 text-ink/50'
@@ -101,6 +112,28 @@ const RestaurantDetails = () => {
             ))}
           </div>
         )}
+
+        <div className="mt-10 border-t border-ink/10 pt-8">
+          <h2 className="font-display text-xl text-ink">
+            Reviews{reviews.length > 0 ? ` (${reviews.length})` : ''}
+          </h2>
+          {reviews.length === 0 ? (
+            <p className="mt-3 font-sans text-sm text-ink/50">No reviews yet.</p>
+          ) : (
+            <div className="mt-4 space-y-4">
+              {reviews.map((review) => (
+                <div key={review._id} className="border-b border-ink/10 pb-4">
+                  <div className="flex items-center justify-between">
+                    <p className="font-sans text-sm font-medium text-ink">{review.customer?.name}</p>
+                    <StarRating value={review.rating} size="text-sm" />
+                  </div>
+                  {review.comment && <p className="mt-1 font-sans text-sm text-ink/60">{review.comment}</p>}
+                  <p className="mt-1 font-sans text-xs text-ink/40">{new Date(review.createdAt).toLocaleDateString()}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

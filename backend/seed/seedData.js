@@ -1,5 +1,12 @@
-const dns = require('dns');
-dns.setServers(['1.1.1.1', '1.0.0.1']);
+// Full demo dataset per Section 21: 10 restaurants, 50+ menu items, 20
+// customers, 3 restaurant owners (note: 3 owners across 10 restaurants means
+// ownership is many-to-one, which is why restaurantController supports
+// multiple restaurants per owner), 1 admin, 12 categories, 5 coupons.
+//
+// Run with: npm run seed
+// Safe to re-run — skips demo data if restaurants already exist, and reuses
+// an existing admin instead of creating a second one.
+
 require('dotenv').config();
 const mongoose = require('mongoose');
 const User = require('../models/User');
@@ -7,7 +14,7 @@ const Restaurant = require('../models/Restaurant');
 const Category = require('../models/Category');
 const MenuItem = require('../models/MenuItem');
 const Coupon = require('../models/Coupon');
- 
+
 const CATEGORY_NAMES = [
   'Momo',
   'Newari Cuisine',
@@ -22,7 +29,8 @@ const CATEGORY_NAMES = [
   'BBQ & Grill',
   'Breakfast',
 ];
- 
+
+// Dish library — keyed by name so RESTAURANTS below can just reference names.
 const DISHES = {
   'Chicken Momo': { description: 'Steamed dumplings filled with minced chicken, served with tomato achar.', price: 220, isVeg: false, category: 'Momo' },
   'Buff Momo': { description: 'Kathmandu-style steamed buffalo momo with a spiced tomato dip.', price: 200, isVeg: false, category: 'Momo' },
@@ -59,8 +67,9 @@ const DISHES = {
   'Pancake Breakfast Set': { description: 'Fluffy pancakes with honey, butter and seasonal fruit.', price: 280, isVeg: true, category: 'Breakfast' },
   'Omelette with Toast': { description: 'Three-egg omelette with vegetables, served with buttered toast.', price: 220, isVeg: false, category: 'Breakfast' },
 };
- 
 
+// 10 restaurants across all 6 target cities. Names are original — not
+// modeled on any real Nepali restaurant (Section 24).
 const RESTAURANTS = [
   { name: 'Newari Ghar', city: 'Kathmandu', address: 'Kirtipur Road, Kathmandu', phone: '014412201', cuisines: ['Newari', 'Local'], ownerIndex: 0, menu: ['Choila', 'Bara', 'Chatamari', 'Samay Baji Set', 'Yomari', 'Sel Roti'] },
   { name: 'Momo Point', city: 'Kathmandu', address: 'Putalisadak, Kathmandu', phone: '014223390', cuisines: ['Momo', 'Fast Food'], ownerIndex: 0, menu: ['Chicken Momo', 'Buff Momo', 'Veg Momo', 'Jhol Momo', 'Chili Momo', 'French Fries'] },
@@ -73,16 +82,16 @@ const RESTAURANTS = [
   { name: 'Sunrise Cafe & Bakery', city: 'Birtamode', address: 'Mahendra Marg, Birtamode', phone: '023540198', cuisines: ['Bakery', 'Breakfast'], ownerIndex: 2, menu: ['Pancake Breakfast Set', 'Omelette with Toast', 'Sel Roti', 'Cold Coffee', 'Masala Tea', 'Lassi'] },
   { name: 'Patan Darbar Kitchen', city: 'Lalitpur', address: 'Mangal Bazar, Lalitpur', phone: '015526754', cuisines: ['Newari', 'Local'], ownerIndex: 0, menu: ['Choila', 'Samay Baji Set', 'Chicken Thakali Set', 'Dal Bhat Tarkari Set', 'Sel Roti'] },
 ];
- 
+
 const OWNERS = [
   { name: 'Prakash Shrestha', email: 'prakash.shrestha@khajago.test', phone: '9801234561' },
   { name: 'Sunita Gurung', email: 'sunita.gurung@khajago.test', phone: '9801234562' },
   { name: 'Bikash Tamang', email: 'bikash.tamang@khajago.test', phone: '9801234563' },
 ];
- 
+
 const CUSTOMER_FIRST_NAMES = ['Aarav', 'Sita', 'Rohan', 'Kritika', 'Bikram', 'Anjali', 'Suresh', 'Priya', 'Nabin', 'Sarita', 'Dipesh', 'Manisha', 'Rajesh', 'Puja', 'Kiran', 'Sabina', 'Nirmal', 'Rekha', 'Sandip', 'Sunita'];
 const CUSTOMER_LAST_NAMES = ['Shrestha', 'Maharjan', 'Rai', 'Gurung', 'Tamang', 'Thapa', 'KC', 'Adhikari', 'Basnet', 'Karki'];
- 
+
 const COUPONS = [
   { code: 'WELCOME10', discountType: 'PERCENTAGE', discountValue: 10, minimumOrder: 500, maximumDiscount: 150, usageLimit: 500 },
   { code: 'FIRST50', discountType: 'FLAT', discountValue: 50, minimumOrder: 300, usageLimit: 1000 },
@@ -90,14 +99,14 @@ const COUPONS = [
   { code: 'FESTIVE100', discountType: 'FLAT', discountValue: 100, minimumOrder: 800, usageLimit: 200 },
   { code: 'WEEKEND15', discountType: 'PERCENTAGE', discountValue: 15, minimumOrder: 500, maximumDiscount: 250, usageLimit: 400 },
 ];
- 
+
 const DEFAULT_PASSWORD = 'Password123!';
- 
+
 const run = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
     console.log('Connected to MongoDB for seeding');
- 
+
     let admin = await User.findOne({ role: 'ADMIN' });
     if (!admin) {
       admin = await User.create({
@@ -106,26 +115,25 @@ const run = async () => {
         phone: '9800000000',
         password: process.env.SEED_ADMIN_PASSWORD || 'ChangeMe123!',
         role: 'ADMIN',
-        isActive: true,
       });
       console.log(`Admin created: ${admin.email}`);
     } else {
       console.log(`Admin already exists: ${admin.email}`);
     }
- 
+
     const existingRestaurantCount = await Restaurant.countDocuments();
     if (existingRestaurantCount > 0) {
       console.log(`${existingRestaurantCount} restaurants already exist — skipping demo data seed.`);
       console.log('Drop the restaurants/categories/menuitems/coupons collections first to reseed.');
       process.exit(0);
     }
- 
+
     const ownerDocs = [];
     for (const owner of OWNERS) {
-      ownerDocs.push(await User.create({ ...owner, password: DEFAULT_PASSWORD, role: 'RESTAURANT', isActive: true }));
+      ownerDocs.push(await User.create({ ...owner, password: DEFAULT_PASSWORD, role: 'RESTAURANT' }));
     }
     console.log(`Created ${ownerDocs.length} restaurant owners`);
- 
+
     for (let i = 0; i < 20; i++) {
       const first = CUSTOMER_FIRST_NAMES[i % CUSTOMER_FIRST_NAMES.length];
       const last = CUSTOMER_LAST_NAMES[i % CUSTOMER_LAST_NAMES.length];
@@ -135,17 +143,16 @@ const run = async () => {
         phone: `98${(10000000 + i).toString().slice(0, 8)}`,
         password: DEFAULT_PASSWORD,
         role: 'CUSTOMER',
-        isActive: true,
       });
     }
     console.log('Created 20 customers');
- 
+
     const categoryDocs = {};
     for (const name of CATEGORY_NAMES) {
       categoryDocs[name] = await Category.create({ name });
     }
     console.log(`Created ${Object.keys(categoryDocs).length} categories`);
- 
+
     let menuItemCount = 0;
     for (const r of RESTAURANTS) {
       const restaurant = await Restaurant.create({
@@ -161,7 +168,7 @@ const run = async () => {
         rating: Math.round((3.5 + Math.random() * 1.4) * 10) / 10,
         ratingCount: Math.floor(10 + Math.random() * 200),
       });
- 
+
       for (const dishName of r.menu) {
         const dish = DISHES[dishName];
         await MenuItem.create({
@@ -177,29 +184,30 @@ const run = async () => {
       }
     }
     console.log(`Created ${RESTAURANTS.length} restaurants and ${menuItemCount} menu items`);
- 
+
     const expiryDate = new Date();
     expiryDate.setMonth(expiryDate.getMonth() + 3);
     for (const coupon of COUPONS) {
       await Coupon.create({ ...coupon, expiryDate });
     }
     console.log(`Created ${COUPONS.length} coupons`);
- 
+
     console.log('\nSeeding complete.\n');
     console.log(`Restaurant owner logins (all share one password: ${DEFAULT_PASSWORD}):`);
     ownerDocs.forEach((o) => console.log(`  ${o.email}`));
     console.log(`\nSample customer login: customer1@khajago.test / ${DEFAULT_PASSWORD}`);
- 
+
     process.exit(0);
   } catch (error) {
     console.error('Seeding failed:', error.message);
     process.exit(1);
   }
 };
- 
 
+// Only run automatically when executed directly (`npm run seed`) — not when
+// required by another script, e.g. a data-integrity check.
 if (require.main === module) {
   run();
 }
- 
+
 module.exports = { CATEGORY_NAMES, DISHES, RESTAURANTS, OWNERS, COUPONS, run };

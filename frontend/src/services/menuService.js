@@ -61,4 +61,4 @@ export default {
   createMenuItem,
   updateMenuItem,
   deleteMenuItem,
-};2
+};

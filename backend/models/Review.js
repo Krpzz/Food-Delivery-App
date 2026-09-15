@@ -11,6 +11,8 @@ const reviewSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// One review per order, enforced at the database level (Section 10 of the
+// dev plan: reviews are only allowed after a completed order).
 reviewSchema.index({ customer: 1, order: 1 }, { unique: true });
 
 module.exports = mongoose.model('Review', reviewSchema);

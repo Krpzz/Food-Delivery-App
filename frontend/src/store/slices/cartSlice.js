@@ -22,7 +22,7 @@ const persist = (state) => {
       })
     );
   } catch {
-    
+    // localStorage can fail (private browsing, quota) - cart just won't survive a reload.
   }
 };
 
@@ -38,7 +38,11 @@ const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
-   
+    // The UI is expected to confirm with the user and dispatch clearCart()
+    // first when switching restaurants (Section 9: "a customer cannot order
+    // from multiple restaurants in the same cart"). This reducer still
+    // guards against a mismatch reaching it, rather than silently mixing
+    // items from two restaurants into one cart.
     addItem: (state, action) => {
       const { menuItemId, name, price, discount, image, isVeg, restaurantId, restaurantName } = action.payload;
 

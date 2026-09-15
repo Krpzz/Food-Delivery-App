@@ -1,4 +1,4 @@
-import MenuItemForm from './menuItemForm';
+import MenuItemForm from '../../components/MenuItemForm';
 
 const AddMenuItem = () => <MenuItemForm mode="create" />;
 

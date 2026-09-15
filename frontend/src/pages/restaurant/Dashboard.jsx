@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { fetchMyRestaurants } from '../../store/slices/resturantSlice';
+import { fetchMyRestaurants } from '../../store/slices/restaurantSlice';
 import menuService from '../../services/menuService';
 import orderService from '../../services/orderService';
+import reviewService from '../../services/reviewService';
+import StarRating from '../../components/StarRating';
 import Loading from '../../components/Loading';
 
 const RestaurantDashboard = () => {
@@ -12,6 +14,7 @@ const RestaurantDashboard = () => {
   const { myRestaurants, activeRestaurantId, isLoading } = useSelector((s) => s.restaurant);
   const [menuCount, setMenuCount] = useState(null);
   const [stats, setStats] = useState(null);
+  const [recentReviews, setRecentReviews] = useState([]);
 
   useEffect(() => {
     dispatch(fetchMyRestaurants());
@@ -23,6 +26,7 @@ const RestaurantDashboard = () => {
     if (activeRestaurantId) {
       menuService.getMenuItemsByRestaurant(activeRestaurantId).then((data) => setMenuCount(data.count));
       orderService.getRestaurantOrderStats(activeRestaurantId).then((data) => setStats(data.stats));
+      reviewService.getRestaurantReviews(activeRestaurantId).then((data) => setRecentReviews(data.reviews.slice(0, 3)));
     }
   }, [activeRestaurantId]);
 
@@ -63,6 +67,7 @@ const RestaurantDashboard = () => {
         {activeRestaurant?.isApproved ? 'Approved & visible to customers' : 'Awaiting admin approval'}
         {' · '}
         {menuCount ?? '—'} menu items
+        {activeRestaurant?.ratingCount > 0 && ` · ★ ${activeRestaurant.rating.toFixed(1)} (${activeRestaurant.ratingCount})`}
       </p>
 
       <div className="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-ink/10 bg-ink/10 sm:grid-cols-5">
@@ -85,6 +90,23 @@ const RestaurantDashboard = () => {
           Edit profile
         </Link>
       </div>
+
+      {recentReviews.length > 0 && (
+        <div className="mt-10 max-w-lg">
+          <p className="font-sans text-sm font-medium text-ink">Recent reviews</p>
+          <div className="mt-3 space-y-3">
+            {recentReviews.map((review) => (
+              <div key={review._id} className="rounded-lg border border-ink/10 p-3">
+                <div className="flex items-center justify-between">
+                  <p className="font-sans text-sm text-ink">{review.customer?.name}</p>
+                  <StarRating value={review.rating} size="text-xs" />
+                </div>
+                {review.comment && <p className="mt-1 font-sans text-xs text-ink/60">{review.comment}</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

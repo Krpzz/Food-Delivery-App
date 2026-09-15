@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import restaurantService from '../../services/resturantService';
+import restaurantService from '../../services/restaurantService';
 import menuService from '../../services/menuService';
-import RestaurantCard from '../../components/ResturantCard';
+import RestaurantCard from '../../components/RestaurantCard';
 import Loading from '../../components/Loading';
 
 const CITIES = ['Kathmandu', 'Lalitpur', 'Bhaktapur', 'Pokhara', 'Biratnagar', 'Birtamode'];

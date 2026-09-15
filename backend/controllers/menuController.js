@@ -4,6 +4,10 @@ const MenuItem = require('../models/MenuItem');
 const Restaurant = require('../models/Restaurant');
 const uploadImage = require('../utils/uploadImage');
 
+// ---------- Categories ----------
+// Shared, platform-wide taxonomy (not owned by a single restaurant). Section
+// 4 lets restaurant owners add new ones as they build their menu; only
+// ADMIN can rename/deactivate, so the list doesn't fragment into near-dupes.
 
 const getCategories = async (req, res, next) => {
   try {
@@ -38,6 +42,8 @@ const createCategory = async (req, res, next) => {
   }
 };
 
+// ADMIN only. The management UI for these lands in Step 11 — the API is
+// ready ahead of time since Section 25 groups "Categories" under Step 4.
 const updateCategory = async (req, res, next) => {
   try {
     const category = await Category.findById(req.params.id);
@@ -69,6 +75,10 @@ const deleteCategory = async (req, res, next) => {
   }
 };
 
+// ---------- Menu items ----------
+
+// Every mutation below re-derives ownership from the database — never from
+// a restaurant ID the client claims to own (Section 20).
 const assertOwnsRestaurant = async (restaurantId, user) => {
   const restaurant = await Restaurant.findById(restaurantId);
   if (!restaurant) {
@@ -84,6 +94,10 @@ const assertOwnsRestaurant = async (restaurantId, user) => {
   return restaurant;
 };
 
+// Cross-restaurant dish search — Section 18 asks customers to be able to
+// search "Restaurants" AND "Food items" as two distinct modes. Restaurant
+// search already lives in restaurantController; this is the food-item half,
+// scoped to items from restaurants customers can actually see (approved).
 const getMenuItems = async (req, res, next) => {
   try {
     const { search, category, isVeg, city, maxPrice, sort } = req.query;
